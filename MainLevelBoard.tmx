@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="11" height="7" tilewidth="128" tileheight="128" infinite="0" nextlayerid="10" nextobjectid="11">
+ <editorsettings>
+  <export target="../../../Volumes/30GB_USB/level2.csv" format="csv"/>
+ </editorsettings>
+ <tileset firstgid="1" source="test1282.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="11" height="7">
+  <data encoding="csv">
+173,173,173,173,173,173,173,173,173,173,173,
+173,25,25,25,25,25,25,25,25,25,168,
+173,25,25,25,25,25,25,25,25,25,168,
+173,25,25,25,25,25,25,25,25,25,168,
+173,25,25,25,25,25,25,25,25,25,168,
+173,25,25,25,25,25,25,25,25,25,168,
+173,173,173,173,173,173,173,173,173,173,173
+</data>
+ </layer>
+ <layer id="3" name="addons" width="11" height="7">
+  <data encoding="csv">
+182,131,131,131,131,131,131,131,131,131,182,
+272,0,0,0,0,0,0,0,0,0,0,
+272,0,0,0,0,0,0,0,0,0,0,
+272,0,0,0,0,0,0,0,0,0,0,
+272,0,0,0,0,0,0,0,0,0,0,
+272,0,0,0,0,0,0,0,0,0,0,
+182,131,131,131,131,131,131,131,131,131,182
+</data>
+ </layer>
+ <objectgroup id="5" name="waypoints1">
+  <object id="1" x="1405" y="195">
+   <polyline points="0,0 -1410,2.5"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="6" name="waypoints2">
+  <object id="4" x="-5" y="317.5">
+   <polyline points="0,0 1412.5,5"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="7" name="waypoints3">
+  <object id="5" x="0" y="452.5">
+   <polyline points="0,0 1407.5,5"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="waypoints4">
+  <object id="9" x="0" y="575">
+   <polyline points="0,0 1410,5"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="9" name="waypoints5">
+  <object id="10" x="-2.5" y="700">
+   <polyline points="0,0 1412.5,-2.5"/>
+  </object>
+ </objectgroup>
+</map>
