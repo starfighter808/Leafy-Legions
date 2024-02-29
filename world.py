@@ -18,7 +18,7 @@ class Battle_Map():
             
             if layer["name"] == "Tile Layer 1":
                 self.Battle_points = layer["data"]
-                print(self.Battle_points)
+              
 
             elif layer["name"] == "Path 1":
                 for obj in layer["objects"]:  

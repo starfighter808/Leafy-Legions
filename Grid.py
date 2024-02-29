@@ -1,5 +1,6 @@
 import pygame as pg
 import json
+import random as r
 import math as m
 import Constants as c
 from Enemy import Zombie
@@ -38,15 +39,14 @@ def create_plant(pos):
     if SIF == True:
         HighFlora = Plant(plant, MTX, MTY)
         Plant_Group.add(HighFlora)  
+
+#Attacking plant
+#def  attack_plant():
 #TitleScreen = pg.image.load().convert_alpha()
 #Create Map
 BMap = Battle_Map(Battle_Map_Data, B_Map)
 BMap.process_map_data()
-print(BMap.Path1)
-print(BMap.Path2)
-print(BMap.Path3)
-print(BMap.Path4)
-print(BMap.Path5)
+
 
 
 
@@ -55,12 +55,27 @@ Zombie_Img = pg.image.load('LDG_Assets/Sprite/Screenshot 2024-02-20 133021.png')
 
 
 #Create Zombie Group
+#Checks for Collision 
 
+        
+     
+    
 Zombie_Group = pg.sprite.Group()
+def SpawnZombie(WC):
+    for k in range(0,WC):
+        if(r.randint(1,5) == 1):
+            Zomboy = Zombie(BMap.Path1, Zombie_Img)
+        elif(r.randint(1,5) == 2):
+            Zomboy = Zombie(BMap.Path2, Zombie_Img)
+        elif(r.randint(1,5) == 3):
+            Zomboy = Zombie(BMap.Path3, Zombie_Img)
+        elif(r.randint(1,5) == 4):
+            Zomboy = Zombie(BMap.Path4, Zombie_Img)
+        else:
+            Zomboy = Zombie(BMap.Path5, Zombie_Img)
 
-Zomboy = Zombie(BMap.Path1, Zombie_Img)
-
-Zombie_Group.add(Zomboy)
+        Zombie_Group.add(Zomboy)
+    
 
 #Create a Plant
 plant = pg.image.load('LDG_Assets/Sprite/Screenshot 2024-02-20 184238.png').convert_alpha()
@@ -68,6 +83,9 @@ Plant_Group = pg.sprite.Group()
 
 #Runs the Screen
 Screen_Run = True
+Collision = False
+waveCounter = 1
+flag = False
 while Screen_Run:
 
     #Framerate
@@ -78,11 +96,55 @@ while Screen_Run:
     #Draw Battle Map
     BMap.draw(Screen)
 
+    
+    if(Zombie_Group.__len__() == 0):
+        SpawnZombie(waveCounter)
+        waveCounter += 1
+                
+           
+            
+
+         
+    
+    #Checks for Collision    
+    for Pg in Plant_Group:
+        for Zg in Zombie_Group:
+            if(Zg.rect.center == Pg.rect.center):
+                Pg.attackedByZombie(1)
+                Collision = True
+                flag = True
+                break
+                
+            else:
+                Collision = False
+        if flag:
+            flag = False
+            break   
+                       
+
+            
+                
+            
+            
+                
+
     #Move the enemy
-    Zombie_Group.update()
+    
+    if Plant_Group.__len__() == 0:
+        Collision = False
+    
+    if Collision != True :
+        for Zg in Zombie_Group:
+            Zg.update()
+    
+    
+
+
 
     #Draw Zombie on the map
-    Zombie_Group.draw(Screen)
+    
+    for Zg in Zombie_Group:
+        Zg.draw(Screen)
     Plant_Group.draw(Screen)
 
  

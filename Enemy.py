@@ -38,3 +38,9 @@ class Zombie(pg.sprite.Sprite):
 
         
         self.rect.center = self.tile
+
+    def draw(self, surface):
+        surface.blit(self.image,self.rect)
+    
+   
+        
