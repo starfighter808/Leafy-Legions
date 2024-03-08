@@ -18,9 +18,9 @@ class Zombie:
             x (int): The initial x-coordinate of the zombie.
             y (int): The initial y-coordinate of the zombie.
         """
-        self.game_controller: 'GameController' = game_controller
-        self.x: int = x
-        self.y: int = y
+        self.game_controller = game_controller
+        self.x = x
+        self.y = y
         self.health: int = 100
         self.speed: float = 1.0
         self.image: str = "assets/images/creeper.png"

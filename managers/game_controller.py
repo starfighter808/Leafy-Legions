@@ -1,56 +1,58 @@
 from entities import Plant, Zombie
 
+Entity = Zombie | Plant
+
 
 class GameController:
     def __init__(self) -> None:
         """
         Initialize a GameController object.
         """
-        self.entities: dict[type[Zombie | Plant], list[Zombie | Plant]] = {
+        self.entities: dict[type[Entity], list[Entity]] = {
             Zombie: [],  # List to store instances of the Zombie class
             Plant: [],  # List to store instances of the Plant class
         }
         self.app_running: bool = True
         self.game_running: bool = True
 
-    def _validate_entity(self, entity: Zombie | Plant) -> type[Zombie | Plant]:
+    def _validate_entity(self, entity: Entity) -> type[Entity]:
         """
         Validate if an entity is of a registered type in the GameController and
         return its base class.
 
         Args:
-            entity (type): The entity to be validated.
+            entity (Entity): The entity to be validated.
 
         Returns:
-            type: The base class of the entity.
+            type[Entity]: The base class of the entity.
 
         Raises:
             ValueError: If the entity type is not registered in the GameController.
         """
-        entity_type: type[Zombie | Plant] = type(entity)
+        entity_type: type[Entity] = type(entity)
         for base_class in self.entities:
             if issubclass(entity_type, base_class):
                 return base_class
         raise ValueError(f"Entity type {entity_type} is not registered in GameController")
 
-    def add(self, entity: Zombie | Plant) -> None:
+    def add(self, entity: Entity) -> None:
         """
         Add an entity to the GameController.
 
         Args:
-            entity: The entity to be added.
+            entity (Entity): The entity to be added.
         """
-        base_class: type[Zombie | Plant] = self._validate_entity(entity)
+        base_class: type[Entity] = self._validate_entity(entity)
         self.entities[base_class].append(entity)
 
-    def remove(self, entity: Zombie | Plant) -> None:
+    def remove(self, entity: Entity) -> None:
         """
         Remove an entity from the GameController.
 
         Args:
-            entity: The entity to be removed.
+            entity (Entity): The entity to be removed.
         """
-        base_class: type[Zombie | Plant] = self._validate_entity(entity)
+        base_class: type[Entity] = self._validate_entity(entity)
         self.entities[base_class].remove(entity)
 
     def reset(self) -> None:
@@ -62,13 +64,13 @@ class GameController:
             Plant: [],  # List to store instances of the Plant class
         }
 
-    def get_entities(self, entity_class: type[Zombie | Plant] = None) -> list[Zombie | Plant]:
+    def get_entities(self, entity_class: type[Entity] = None) -> list[Entity]:
         """
         Get entities on the board or entities of a specific class registered in the GameController.
         This will not return derived classes, such as SpeedyZombie.
 
         Args:
-            entity_class (optional): The class of entities to retrieve (e.g., Zombie or Plant).
+            entity_class (type[Entity] | None): The class of entities to retrieve (e.g., Zombie or Plant).
 
         Returns:
             list: A list containing all entities or entities of the specified class.

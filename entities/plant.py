@@ -15,8 +15,8 @@ class Plant:
             x (int): The initial x-coordinate of the plant.
             y (int): The initial y-coordinate of the plant.
         """
-        self.game_controller: 'GameController' = game_controller
-        self.x: int = x
-        self.y: int = y
+        self.game_controller = game_controller
+        self.x = x
+        self.y = y
         self.image: str = "assets/images/plant.png"
         self.health: int = 150  # Health of the plant
