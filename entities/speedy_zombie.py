@@ -1,8 +1,12 @@
+# Local Imports
 from entities.zombie import Zombie
 from managers import GameController
 
 
 class SpeedyZombie(Zombie):
+    """
+    A SpeedyZombie a type of Zombie with increased speed.
+    """
     def __init__(self, game_controller: GameController, x: int, y: int) -> None:
         """
         Initializes a SpeedyZombie object, inheriting from the Zombie class

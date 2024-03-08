@@ -4,18 +4,22 @@ Entity = Zombie | Plant
 
 
 class GameController:
+    """
+    The GameController class is responsible for managing entities on the game board,
+    along with the application and game running statuses.
+    """
     def __init__(self) -> None:
         """
         Initialize a GameController object.
         """
-        self.entities: dict[type[Entity], list[Entity]] = {
+        self.__entities: dict[type[Entity], list[Entity]] = {
             Zombie: [],  # List to store instances of the Zombie class
             Plant: [],  # List to store instances of the Plant class
         }
-        self.app_running: bool = True
-        self.game_running: bool = True
+        self.__app_running: bool = True
+        self.__game_running: bool = True
 
-    def _validate_entity(self, entity: Entity) -> type[Entity]:
+    def __validate_entity(self, entity: Entity) -> type[Entity]:
         """
         Validate if an entity is of a registered type in the GameController and
         return its base class.
@@ -30,7 +34,7 @@ class GameController:
             ValueError: If the entity type is not registered in the GameController.
         """
         entity_type: type[Entity] = type(entity)
-        for base_class in self.entities:
+        for base_class in self.__entities:
             if issubclass(entity_type, base_class):
                 return base_class
         raise ValueError(f"Entity type {entity_type} is not registered in GameController")
@@ -42,8 +46,8 @@ class GameController:
         Args:
             entity (Entity): The entity to be added.
         """
-        base_class: type[Entity] = self._validate_entity(entity)
-        self.entities[base_class].append(entity)
+        base_class: type[Entity] = self.__validate_entity(entity)
+        self.__entities[base_class].append(entity)
 
     def remove(self, entity: Entity) -> None:
         """
@@ -52,14 +56,14 @@ class GameController:
         Args:
             entity (Entity): The entity to be removed.
         """
-        base_class: type[Entity] = self._validate_entity(entity)
-        self.entities[base_class].remove(entity)
+        base_class: type[Entity] = self.__validate_entity(entity)
+        self.__entities[base_class].remove(entity)
 
     def reset(self) -> None:
         """
         Reset the GameController by clearing all entities.
         """
-        self.entities = {
+        self.__entities = {
             Zombie: [],  # List to store instances of the Zombie class
             Plant: [],  # List to store instances of the Plant class
         }
@@ -79,11 +83,10 @@ class GameController:
             ValueError: If the specified entity_class is not registered in the GameController.
         """
         if entity_class is None:
-            return [entity for entities_list in self.entities.values() for entity in entities_list]
-        elif entity_class in self.entities:
-            return self.entities[entity_class]
-        else:
-            raise ValueError(f"Entity class {entity_class} is not registered in GameController")
+            return [entity for entities_list in self.__entities.values() for entity in entities_list]
+        if entity_class in self.__entities:
+            return self.__entities[entity_class]
+        raise ValueError(f"Entity class {entity_class} is not registered in GameController")
 
     def set_game_status(self, game_running: bool) -> None:
         """
@@ -92,7 +95,7 @@ class GameController:
         Args:
             game_running (bool): The status of the game.
         """
-        self.game_running = game_running
+        self.__game_running = game_running
         if not game_running:
             self.reset()
 
@@ -103,7 +106,7 @@ class GameController:
         Args:
             app_running (bool): The status of the game.
         """
-        self.app_running = app_running
+        self.__app_running = app_running
 
     def get_status(self, status_type: str) -> bool:
         """
@@ -119,8 +122,7 @@ class GameController:
             ValueError: If an invalid status_type is provided.
         """
         if status_type == 'app':
-            return self.app_running
-        elif status_type == 'game':
-            return self.game_running
-        else:
-            raise ValueError("Invalid status_type. Use 'app' or 'game'.")
+            return self.__app_running
+        if status_type == 'game':
+            return self.__game_running
+        raise ValueError("Invalid status_type. Use 'app' or 'game'.")

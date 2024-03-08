@@ -1,3 +1,4 @@
+# Standard Imports
 from typing import TYPE_CHECKING
 
 # To import GameController without circular dependency errors
@@ -6,6 +7,10 @@ if TYPE_CHECKING:
 
 
 class Plant:
+    """
+    A Plant is a stationary entity that is placed
+    on the game board to defend against zombies.
+    """
     def __init__(self, game_controller: 'GameController', x: int, y: int) -> None:
         """
         Initializes a Plant object.

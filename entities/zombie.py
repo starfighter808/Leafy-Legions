@@ -1,7 +1,11 @@
-import pygame
+# System Imports
 from typing import TYPE_CHECKING
-from . import Plant
 
+# Library Imports
+import pygame
+
+# Local Imports
+from . import Plant
 
 # To import GameController without circular dependency errors
 if TYPE_CHECKING:
@@ -9,6 +13,10 @@ if TYPE_CHECKING:
 
 
 class Zombie:
+    """
+    A Zombie is a hostile entity that moves across the
+    board and attacks plants on the game board.
+    """
     def __init__(self, game_controller: 'GameController', x: int, y: int) -> None:
         """
         Initializes a Zombie object.
@@ -23,13 +31,13 @@ class Zombie:
         self.y = y
         self.health: int = 100
         self.speed: float = 1.0
+        self.attack_speed: float = 1.0
         self.image: str = "assets/images/creeper.png"
         self.collided_with_plant: bool = False  # Flag to indicate collision with a plant
 
-        self.attack_speed: float = 1.0
-        self.last_attack: int = 0
+        self.__last_attack: int = 0
 
-    def _can_attack(self) -> bool:
+    def __can_attack(self) -> bool:
         """
         Check if the zombie can perform an attack based on attack speed.
 
@@ -37,7 +45,7 @@ class Zombie:
             bool: True if the zombie can attack, False otherwise.
         """
         current_time: int = pygame.time.get_ticks()
-        return current_time - self.last_attack >= 1000 / self.attack_speed
+        return current_time - self.__last_attack >= 1000 / self.attack_speed
 
     def attack_plant(self, plant: Plant) -> None:
         """
@@ -47,8 +55,8 @@ class Zombie:
             plant (Plant): The plant object being attacked.
         """
         self.collided_with_plant = True
-        if self._can_attack():
-            self.last_attack = pygame.time.get_ticks()
+        if self.__can_attack():
+            self.__last_attack = pygame.time.get_ticks()
 
             plant.health -= 25
             print(f"Zombie attacking Plant ({plant.x}, {plant.y}). Health: {plant.health}")

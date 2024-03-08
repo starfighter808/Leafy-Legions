@@ -1,8 +1,20 @@
+"""
+Leafy Legions Main Module
+
+This module defines the main structure and functionality of the Leafy Legions game. It includes
+constants, game initialization, entity management, and the game loop.
+
+@author RELLIS Developments
+"""
+
+# System Imports
+import sys
 from types import ModuleType
 
+# Library Imports
 import pygame
-import sys
 
+# Local Imports
 from entities import Plant, Zombie, SpeedyZombie
 from entities import __all__ as all_entities
 from managers import GameController
@@ -37,7 +49,7 @@ pygame.mixer.music.set_volume(0.05)
 pygame.mixer.music.play()
 
 # Game Management
-game_controller: GameController = GameController()
+game_controller = GameController()
 
 
 def load_and_scale_entity_images(entities_module: ModuleType) -> dict[type, pygame.Surface]:
@@ -48,7 +60,7 @@ def load_and_scale_entity_images(entities_module: ModuleType) -> dict[type, pyga
         entities_module (ModuleType): The module containing entity classes.
 
     Returns:
-        dict: A dictionary mapping entity classes to their scaled images.
+        dict[type, pygame.Surface]: A dictionary mapping entity classes to their scaled images.
     """
     scaled_images: dict[type, pygame.Surface] = {}
     for entity_name in all_entities:
@@ -170,9 +182,9 @@ while game_controller.get_status('app'):
                                            and plant.y == grid_y * GRID_SIZE for plant in plants)
                 if not existing_plant and (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT):
                     # Plant a plant at the clicked position if it's within the grid
-                    new_plant: Plant = Plant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
+                    new_plant = Plant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
                     game_controller.add(new_plant)
-                    print(f"New Plant {new_plant.x, new_plant.y}")
+                    print(f"New Plant {new_plant.x, new_plant.y}. Health: {new_plant.health}")
 
     # While the game is running, draw entities, handle zombie movement, and allow zombies to attack
     if game_controller.get_status('game'):
