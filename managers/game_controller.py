@@ -185,7 +185,7 @@ class GameController:
         self.__coins -= coins
         self.play_sound('moneyfalls.ogg', 0.05)
 
-    def get_current_wave(self) -> int:
+    def get_wave(self) -> int:
         """
         Return the current wave
         """

@@ -31,6 +31,7 @@ BLACK: tuple[int, int, int] = (0, 0, 0)
 RED: tuple[int, int, int] = (255, 0, 0)
 BACKGROUND_IMAGE_PATH: str = 'assets/images/background.jpg'
 BACKGROUND_MUSIC_PATH: str = 'assets/sounds/backgroundmusic.mp3'
+PLANT_COST = 15
 
 # Initialize Pygame
 pygame.init()
@@ -89,32 +90,25 @@ entity_images: dict[type, list[pygame.Surface]] = load_and_scale_entity_images(s
 game_controller.set_game_status(True)
 
 
-def initialize_zombies() -> None:
+def begin_wave() -> None:
     """
-    Initialize a list of zombies
+    Start the wave
     """
     zombie_roles = [Zombie]
-    wave = game_controller.get_current_wave()
+    wave = game_controller.get_wave()
 
+    # On wave 5, start adding SpeedyZombies
     if wave >= 5:
         zombie_roles.append(SpeedyZombie)
 
-    for i in range(wave):
+    for _ in range(wave):
         role = random.choice(zombie_roles)
-        x = ((GRID_WIDTH - 1) * GRID_SIZE) + 80  # Start in the rightmost column, outside of the map
+        x = ((GRID_WIDTH - 1) * GRID_SIZE) + 75 + random.choice(
+            list(range(-50, 51, 25)))  # Start in the rightmost column, outside of the map
         y = random.randint(0, 4) * GRID_SIZE  # Randomize the row
 
         new_zombie = role(game_controller, x, y)
         game_controller.add(new_zombie)
-
-    print(len(game_controller.get_entities(Zombie)))
-
-
-# Create lists of plants and zombies
-initialize_zombies()
-zombies: list[Zombie] = game_controller.get_entities(Zombie)
-plants: list[Plant] = game_controller.get_entities(Plant)
-projectiles: list[Projectile] = game_controller.get_entities(Projectile)
 
 
 def draw_grid_and_entities(objs: list[Zombie | Plant | Projectile]) -> None:
@@ -186,6 +180,9 @@ def draw_button(message: str, button_color: tuple[int, int, int],
 
 # While pygame is open
 while game_controller.get_status('app'):
+    zombies: list[Zombie] = game_controller.get_entities(Zombie)
+    plants: list[Plant] = game_controller.get_entities(Plant)
+    projectiles: list[Projectile] = game_controller.get_entities(Projectile)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_controller.set_app_status(False)
@@ -197,10 +194,7 @@ while game_controller.get_status('app'):
                 play_again_button_rect = pygame.Rect(screen.get_width() / 2 - 54, screen.get_height() / 2 + 36, 110, 26)
                 if play_again_button_rect.collidepoint(mouse_pos):
                     pygame.mixer.music.play()
-                    initialize_zombies()
-                    zombies: list[Zombie] = game_controller.get_entities(Zombie)
-                    plants: list[Plant] = game_controller.get_entities(Plant)
-                    projectiles: list[Projectile] = game_controller.get_entities(Projectile)
+                    begin_wave()
                     game_controller.set_game_status(True)
 
             # If mouse press while game is running (planting)
@@ -216,19 +210,25 @@ while game_controller.get_status('app'):
                                            and plant.y == grid_y * GRID_SIZE for plant in plants)
                 if not existing_plant and (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT):
                     # Plant a plant at the clicked position if it's within the grid
-                    if game_controller.get_coins() >= 15:
-                        game_controller.remove_coins(15)
+                    if game_controller.get_coins() >= PLANT_COST:
+                        game_controller.remove_coins(PLANT_COST)
                         new_plant = Plant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
                         game_controller.add(new_plant)
                         print(f"New Plant {new_plant.x, new_plant.y}. Health: {new_plant.health}")
                     else:
-                        game_controller.play_sound('error.mp3', 0.1)
+                        game_controller.play_sound('error.mp3', 0.15)
+                else:
+                    game_controller.play_sound('error.mp3', 0.15)
 
     # While the game is running, draw entities, handle zombie movement, and allow zombies to attack
     if game_controller.get_status('game'):
         draw_grid_and_entities(game_controller.get_entities())
         display_message(f"Coins: {game_controller.get_coins()}", WHITE, (60, 25))
-        display_message(f"Wave: {game_controller.get_current_wave()}", WHITE, (60, 55))
+        display_message(f"Wave: {game_controller.get_wave()-1}", WHITE, (60, 55))
+
+        if not game_controller.get_entities(Zombie):
+            begin_wave()
+            game_controller.update_wave()
 
         for plant in plants:
             for zombie in zombies:
@@ -237,10 +237,6 @@ while game_controller.get_status('app'):
                         zombie.attack_plant(plant)
                     if zombie.x >= plant.x:
                         plant.shoot_projectile()
-
-        if len(zombies) <= 0:
-            game_controller.update_wave()
-            initialize_zombies()
 
         for zombie in zombies:
             zombie.update_position()
