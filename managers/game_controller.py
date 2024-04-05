@@ -1,6 +1,13 @@
-from entities import Plant, Zombie
+# Standard Imports
+import os
 
-Entity = Zombie | Plant
+# Library Imports
+import pygame
+
+# Local Imports
+from entities import Plant, Zombie, Projectile
+
+Entity = Zombie | Plant | Projectile
 
 
 class GameController:
@@ -8,6 +15,7 @@ class GameController:
     The GameController class is responsible for managing entities on the game board,
     along with the application and game running statuses.
     """
+
     def __init__(self) -> None:
         """
         Initialize a GameController object.
@@ -15,12 +23,15 @@ class GameController:
         self.__entities: dict[type[Entity], list[Entity]] = {
             Zombie: [],  # List to store instances of the Zombie class
             Plant: [],  # List to store instances of the Plant class
+            Projectile: [],  # List to store instances of the Projectile class
         }
         self.__app_running: bool = True
-        self.__game_running: bool = True
+        self.__game_running: bool = False
+        self.__coins: int = 25
+        self.__wave: int = 1
 
     def __validate_entity(self, entity: Entity) -> type[Entity]:
-        """
+        """s
         Validate if an entity is of a registered type in the GameController and
         return its base class.
 
@@ -66,7 +77,10 @@ class GameController:
         self.__entities = {
             Zombie: [],  # List to store instances of the Zombie class
             Plant: [],  # List to store instances of the Plant class
+            Projectile: [],  # List to store instances of the Projectile class
         }
+        self.__coins = 25
+        self.__wave = 1
 
     def get_entities(self, entity_class: type[Entity] = None) -> list[Entity]:
         """
@@ -126,3 +140,59 @@ class GameController:
         if status_type == 'game':
             return self.__game_running
         raise ValueError("Invalid status_type. Use 'app' or 'game'.")
+
+    def play_sound(self, effect_file: str, volume: float = 1.0) -> None:
+        """
+        Play sound effect
+
+        Args:
+            effect_file (str): Name of the sound effect file
+            volume (float): Volume of the sound effect (default = 1.0)
+
+        Raises:
+            FileNotFoundError: If no sound is found
+        """
+
+        sound_path = f"./assets/sounds/{effect_file}"
+        if self.__game_running:
+            if os.path.exists(sound_path):
+                sound = pygame.mixer.Sound(sound_path)
+                sound.set_volume(volume)
+                sound.play()
+            else:
+                raise FileNotFoundError(f"No sound effect at {sound_path}")
+
+    def get_coins(self) -> int:
+        """
+        Get the coins of the current game session
+
+        Returns:
+            int: The current coins.
+        """
+        return self.__coins
+
+    def add_coins(self, coins: int) -> None:
+        """
+        Add users' coins
+        """
+        self.__coins += coins
+        self.play_sound('moneyfalls.ogg', 0.05)
+
+    def remove_coins(self, coins: int) -> None:
+        """
+        Remove users' coins
+        """
+        self.__coins -= coins
+        self.play_sound('moneyfalls.ogg', 0.05)
+
+    def get_current_wave(self) -> int:
+        """
+        Return the current wave
+        """
+        return self.__wave
+
+    def update_wave(self) -> None:
+        """
+        Increase the wave
+        """
+        self.__wave += 1

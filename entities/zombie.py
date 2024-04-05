@@ -5,14 +5,15 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from . import Plant
+from . import Entity
 
 # To import GameController without circular dependency errors
 if TYPE_CHECKING:
     from managers import GameController
+    from . import Plant
 
 
-class Zombie:
+class Zombie(Entity):
     """
     A Zombie is a hostile entity that moves across the
     board and attacks plants on the game board.
@@ -26,13 +27,11 @@ class Zombie:
             x (int): The initial x-coordinate of the zombie.
             y (int): The initial y-coordinate of the zombie.
         """
-        self.game_controller = game_controller
-        self.x = x
-        self.y = y
+        super().__init__(game_controller, x, y, ["assets/images/zombie_1.png", "assets/images/zombie_2.png"])
+        self.image_size: tuple[int, int] = (56, 112)
         self.health: int = 100
         self.speed: float = 1.0
         self.attack_speed: float = 1.0
-        self.image: str = "assets/images/creeper.png"
         self.collided_with_plant: bool = False  # Flag to indicate collision with a plant
 
         self.__last_attack: int = 0
@@ -47,7 +46,7 @@ class Zombie:
         current_time: int = pygame.time.get_ticks()
         return current_time - self.__last_attack >= 1000 / self.attack_speed
 
-    def attack_plant(self, plant: Plant) -> None:
+    def attack_plant(self, plant: 'Plant') -> None:
         """
         Attack a plant.
 
