@@ -67,20 +67,10 @@ class GameController:
         Args:
             entity (Entity): The entity to be removed.
         """
-        base_class: type[Entity] = self.__validate_entity(entity)
-        self.__entities[base_class].remove(entity)
-
-    def reset(self) -> None:
-        """
-        Reset the GameController by clearing all entities.
-        """
-        self.__entities = {
-            Zombie: [],  # List to store instances of the Zombie class
-            Plant: [],  # List to store instances of the Plant class
-            Projectile: [],  # List to store instances of the Projectile class
-        }
-        self.__coins = 25
-        self.__wave = 1
+        for entities_list in self.__entities.values():
+            if entity in entities_list:
+                base_class: type[Entity] = self.__validate_entity(entity)
+                self.__entities[base_class].remove(entity)
 
     def get_entities(self, entity_class: type[Entity] = None) -> list[Entity]:
         """
@@ -101,6 +91,27 @@ class GameController:
         if entity_class in self.__entities:
             return self.__entities[entity_class]
         raise ValueError(f"Entity class {entity_class} is not registered in GameController")
+
+    def clear_entities(self, entity_class: type[Entity]) -> None:
+        """
+        Clears the entities of that specific class
+
+        Args:
+            entity_class (type[Entity]): The class of entities to clear (e.g., Zombie or Plant).
+        """
+        if entity_class in self.__entities:
+            self.__entities[entity_class].clear()
+        else:
+            raise ValueError(f"Entity class {entity_class} is not registered in GameController")
+
+    def reset(self) -> None:
+        """
+        Reset the GameController by clearing all entities.
+        """
+        for entity in self.__entities:
+            self.clear_entities(entity)
+        self.__coins = 25
+        self.__wave = 1
 
     def set_game_status(self, game_running: bool) -> None:
         """

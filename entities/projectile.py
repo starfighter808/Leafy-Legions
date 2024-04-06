@@ -2,12 +2,11 @@
 from typing import TYPE_CHECKING
 
 # Local Imports
-from . import Entity
+from . import Entity, Zombie
 
 # To import GameController without circular dependency errors
 if TYPE_CHECKING:
     from managers import GameController
-    from . import Zombie
 
 
 class Projectile(Entity):
@@ -30,7 +29,7 @@ class Projectile(Entity):
         self.speed: float = 5.0
         self.collided_with_zombie: bool = False  # Flag to indicate collision with a plant
 
-    def attack_zombie(self, zombie: 'Zombie'):
+    def attack_zombie(self, zombie: Zombie):
         """
         Attack a zombie.
 

@@ -6,10 +6,10 @@ constants, game initialization, entity management, and the game loop.
 
 @author RELLIS Developments
 """
-
 # System Imports
 import sys
 import random
+import math
 from types import ModuleType
 
 # Library Imports
@@ -38,7 +38,7 @@ pygame.init()
 
 # Set up the game window
 screen: pygame.Surface = pygame.display.set_mode((GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE))
-pygame.display.set_caption("Leafy Legions Test Display")
+pygame.display.set_caption("Leafy Legions")
 
 # Load images and scale them to match the grid size
 background_image: pygame.Surface = pygame.image.load(BACKGROUND_IMAGE_PATH)
@@ -94,18 +94,36 @@ def begin_wave() -> None:
     """
     Start the wave
     """
-    zombie_roles = [Zombie]
+
+    # Remove all projectiles on the board after each wave
+    game_controller.clear_entities(Projectile)
     wave = game_controller.get_wave()
 
-    # On wave 5, start adding SpeedyZombies
-    if wave >= 5:
-        zombie_roles.append(SpeedyZombie)
+    # For Waves 1-3, number of zombies = wave number
+    if wave <= 3:
+        num_zombies = wave
+    else:
+        # For Wave 4+, exponentially increase zombie count
+        num_zombies = wave + math.ceil(3 + math.log(wave, 4))
 
-    for _ in range(wave):
+    zombie_roles = []
+
+    # For Wave 5+, start adding SpeedyZombies
+    if wave >= 5:
+        weight_speedy = min((wave - 4) * 0.1, 1.0)  # Weight SpeedyZombies into the mix
+        zombie_roles.extend([SpeedyZombie] * int(num_zombies * weight_speedy))
+
+    # For any room left in the array, fill with regular Zombies
+    remaining_zombies = num_zombies - len(zombie_roles)
+    zombie_roles.extend([Zombie] * remaining_zombies)
+
+    for _ in range(num_zombies):
+        # Choose a random zombie based on choices available
         role = random.choice(zombie_roles)
-        x = ((GRID_WIDTH - 1) * GRID_SIZE) + 75 + random.choice(
-            list(range(-50, 51, 25)))  # Start in the rightmost column, outside of the map
-        y = random.randint(0, 4) * GRID_SIZE  # Randomize the row
+
+        # Create a zombie spawn position with a random row
+        x = ((GRID_WIDTH - 1) * GRID_SIZE) + 75 + random.choice(list(range(-50, 126, 20)))
+        y = random.randint(0, 4) * GRID_SIZE
 
         new_zombie = role(game_controller, x, y)
         game_controller.add(new_zombie)
@@ -137,8 +155,12 @@ def draw_grid_and_entities(objs: list[Zombie | Plant | Projectile]) -> None:
                 cell_center_x = obj.x + (GRID_SIZE - obj.image_size[0]) / 2
                 cell_center_y = obj.y + (GRID_SIZE - obj.image_size[1]) / 2
 
+                # Assign a random animation offset to each entity
+                if not hasattr(obj, 'animation_offset'):
+                    obj.animation_offset = random.randint(0, 10000)
+
                 # Calculate index of the image to display based on time
-                image_index = (current_time // 1000) % len(images)
+                image_index = ((current_time + obj.animation_offset) // 500) % len(images)
                 screen.blit(images[image_index], (cell_center_x, cell_center_y))
 
             except (AttributeError, IndexError):
@@ -224,7 +246,7 @@ while game_controller.get_status('app'):
     if game_controller.get_status('game'):
         draw_grid_and_entities(game_controller.get_entities())
         display_message(f"Coins: {game_controller.get_coins()}", WHITE, (60, 25))
-        display_message(f"Wave: {game_controller.get_wave()-1}", WHITE, (60, 55))
+        display_message(f"Wave: {game_controller.get_wave() - 1}", WHITE, (60, 55))
 
         if not game_controller.get_entities(Zombie):
             begin_wave()
@@ -235,7 +257,9 @@ while game_controller.get_status('app'):
                 if zombie.y == plant.y:
                     if zombie.x <= plant.x <= zombie.x + GRID_SIZE:
                         zombie.attack_plant(plant)
-                    if zombie.x >= plant.x:
+
+                    # Ensure the zombie is visible on the board, in front of the plant
+                    if plant.x <= zombie.x <= 1100:
                         plant.shoot_projectile()
 
         for zombie in zombies:
