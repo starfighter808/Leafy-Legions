@@ -29,8 +29,8 @@ class Zombie(Entity):
         """
         super().__init__(game_controller, x, y, ["assets/images/zombie_1.png", "assets/images/zombie_2.png"])
         self.image_size: tuple[int, int] = (56, 112)
-        self.health: int = 100
-        self.speed: float = 1.0
+        self.health: int = 200
+        self.speed: float = 2.0
         self.attack_speed: float = 1.0
         self.collided_with_plant: bool = False  # Flag to indicate collision with a plant
 

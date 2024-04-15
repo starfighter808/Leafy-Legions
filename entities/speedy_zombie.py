@@ -26,5 +26,5 @@ class SpeedyZombie(Zombie):
         super().__init__(game_controller, x, y)
         self.image = ["assets/images/speedyZombie.png"]
         self.image_size = (125, 125)
-        self.speed: float = 3.0
+        self.speed: float = 4.0
 

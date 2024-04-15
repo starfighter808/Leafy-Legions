@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 
 # Local Imports
-from . import Plant
+from .plant import Plant
 
 # To import GameController without circular dependency errors
 if TYPE_CHECKING:
@@ -23,7 +23,8 @@ class RosePlant(Plant):
             x (int): The initial x-coordinate of the plant.
             y (int): The initial y-coordinate of the plant.
         """
-        super().__init__(game_controller, x, y, ["assets/images/Rose_plant.png"])
-        self.health: int = 100  # Health of the plantss
+        super().__init__(game_controller, x, y)
+        self.health: int = 75  # Health of the plantss
+        self.image = ["assets/images/Rose_Plant.png"]
         self.attack_speed: float = 2.0
         self.game_controller.play_sound('plant.ogg', 0.05)

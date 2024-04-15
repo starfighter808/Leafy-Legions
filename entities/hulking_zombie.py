@@ -26,5 +26,5 @@ class HulkingZombie(Zombie):
         super().__init__(game_controller, x, y)
         self.image = ["assets/images/Hulk_Zombie.png"]
         self.image_size = (125, 125)
-        self.speed: float = 0.75
-        self.health: int = 300
+        self.speed: float = 1.75
+        self.health: int = 500
