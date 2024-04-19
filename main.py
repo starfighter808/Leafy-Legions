@@ -16,7 +16,7 @@ from types import ModuleType
 import pygame
 
 # Local Imports
-from entities import Plant, Zombie, SpeedyZombie, Projectile, RosePlant, HulkingZombie  
+from entities import Plant, Zombie, SpeedyZombie, Projectile, RosePlant, HulkingZombie, PolymorphZombie  
 from entities import __all__ as all_entities
 from managers import GameController
 
@@ -117,6 +117,10 @@ def begin_wave() -> None:
     if wave >= 10:
         weight_Hulking = min((wave - 9) * 0.1, 1.0)  # Weight HulkingZombies into the mix
         zombie_roles.extend([HulkingZombie] * int(num_zombies * weight_Hulking))
+
+    if wave >= 15:
+        weight_Poly = min((wave - 9) * 0.1, 1.0)  # Weight HulkingZombies into the mix
+        zombie_roles.extend([PolymorphZombie] * int(num_zombies * weight_Hulking))
 
     # For any room left in the array, fill with regular Zombies
     remaining_zombies = num_zombies - len(zombie_roles)
