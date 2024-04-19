@@ -260,6 +260,10 @@ while game_controller.get_status('app'):
         if not game_controller.get_entities(Zombie):
             begin_wave()
             game_controller.update_wave()
+        #Auto sets the Collision false to fix the collision issue when
+        #Attacking plants
+        for zombie in zombies:
+            zombie.collided_with_plant = False
 
         for plant in plants:
             for zombie in zombies:
