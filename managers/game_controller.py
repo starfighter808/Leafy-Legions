@@ -27,7 +27,7 @@ class GameController:
         }
         self.__app_running: bool = True
         self.__game_running: bool = False
-        self.__coins: int = 25
+        self.__coins: int = 25 # default: 25
         self.__wave: int = 1
 
     def __validate_entity(self, entity: Entity) -> type[Entity]:

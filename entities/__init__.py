@@ -8,8 +8,9 @@ from .entity import Entity
 from .zombie import Zombie
 from .projectile import Projectile
 from .plant import Plant
+from .big_plant import BigPlant
 from .speedy_zombie import SpeedyZombie
 
-__all__ = ['Entity', 'Plant', 'Zombie', 'SpeedyZombie', 'Projectile']
+__all__ = ['Entity', 'Plant', 'BigPlant', 'Zombie', 'SpeedyZombie', 'Projectile']
 
 print("Loaded Module: Entities")

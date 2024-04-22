@@ -29,7 +29,7 @@ class Plant(Entity):
         """
         super().__init__(game_controller, x, y, ["assets/images/plant.png"])
         self.health: int = 150  # Health of the plant
-
+        self.cost: int = 15
         self.attack_speed: float = 1.0
         self.__last_attack: int = 0
         self.game_controller.play_sound('plant.ogg', 0.05)

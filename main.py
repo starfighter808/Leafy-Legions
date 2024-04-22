@@ -16,33 +16,41 @@ from types import ModuleType
 import pygame
 
 # Local Imports
-from entities import Plant, Zombie, SpeedyZombie, Projectile
+from entities import Plant, BigPlant, Zombie, SpeedyZombie, Projectile
 from entities import __all__ as all_entities
 from managers import GameController
 
-# Constants defining the grid dimensions, zombie properties, and game settings
+# CONSTANTS
+DELAY_MS: int = 5 # Controls game speed, default is 50ms but lower is more fun.
 GRID_WIDTH: int = 9
 GRID_HEIGHT: int = 5
 GRID_SIZE: int = 125
+SIDEBAR_WIDTH: int = 150
+WINDOW_WIDTH: int = GRID_WIDTH * GRID_SIZE+SIDEBAR_WIDTH
+BOARD_WIDTH: int = GRID_WIDTH * GRID_SIZE
+WINDOW_HEIGHT: int = GRID_HEIGHT * GRID_SIZE
 DAMAGE_PER_HIT: int = 25
-DELAY_MS: int = 50
 WHITE: tuple[int, int, int] = (255, 255, 255)
 BLACK: tuple[int, int, int] = (0, 0, 0)
 RED: tuple[int, int, int] = (255, 0, 0)
 BACKGROUND_IMAGE_PATH: str = 'assets/images/background.jpg'
 BACKGROUND_MUSIC_PATH: str = 'assets/sounds/backgroundmusic.mp3'
-PLANT_COST = 15
+PLANT_IMAGE_PATH: str = 'assets/images/plant.png' 
+
+# VARIABLES
+planting = False
+selected_plant = None
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the game window
-screen: pygame.Surface = pygame.display.set_mode((GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE))
+screen: pygame.Surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Leafy Legions")
 
 # Load images and scale them to match the grid size
 background_image: pygame.Surface = pygame.image.load(BACKGROUND_IMAGE_PATH)
-background_image = pygame.transform.scale(background_image, (GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE))
+background_image = pygame.transform.scale(background_image, (BOARD_WIDTH, WINDOW_HEIGHT))
 
 # Initialize Pygame mixer and load background music
 pygame.mixer.init()
@@ -122,7 +130,7 @@ def begin_wave() -> None:
         role = random.choice(zombie_roles)
 
         # Create a zombie spawn position with a random row
-        x = ((GRID_WIDTH - 1) * GRID_SIZE) + 75 + random.choice(list(range(-50, 126, 20)))
+        x = ((GRID_WIDTH - 1) * GRID_SIZE) + 75 + random.choice(list(range(-50, 60, 20)))
         y = random.randint(0, 4) * GRID_SIZE
 
         new_zombie = role(game_controller, x, y)
@@ -136,6 +144,13 @@ def draw_grid_and_entities(objs: list[Zombie | Plant | Projectile]) -> None:
     Args:
         objs (list): A list of entities to be drawn.
     """
+
+
+    pygame.draw.rect(screen, BLACK, (BOARD_WIDTH, 0, SIDEBAR_WIDTH, WINDOW_HEIGHT))
+    # Draw buttons
+    draw_button("Lil Flower", (0, 255, 0), (BOARD_WIDTH + SIDEBAR_WIDTH / 2, 100))
+    draw_button("Pecan Tree", (0, 255, 0), (BOARD_WIDTH + SIDEBAR_WIDTH / 2, 200))
+    draw_button("Cancel", RED, (BOARD_WIDTH + SIDEBAR_WIDTH / 2, 300))
 
     screen.blit(background_image, (0, 0))
     for x in range(0, GRID_WIDTH * GRID_SIZE, GRID_SIZE):
@@ -199,12 +214,76 @@ def draw_button(message: str, button_color: tuple[int, int, int],
     pygame.draw.rect(screen, button_color, button_rect, border_radius=5)
     screen.blit(button_text, button_rect)
 
+def handle_plant_click(plant_class: type):
+    # if plant_name in ["Plant1", "Plant2", "Plant3", "Cancel"]:
+    #     print(plant_name)
+    new_plant = Plant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
+    new_plant = BigPlant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
+    if issubclass(plant_class, Plant):
+        global planting
+        planting = True
+        # Instantiate the selected plant class
+        new_plant = plant_class(game_controller, 0, 0)
+        print(f"Selected Plant: {plant_class.__name__}. Cost: {new_plant.cost}")
+        global selected_plant
+        selected_plant = plant_class
+    else:
+        print("Invalid plant selection")
+
+def is_click_on_button(button_name, mouse_pos):
+    # Check if the mouse click is within the button's area
+    if button_name == "Plant1":
+        button_rect = pygame.Rect(BOARD_WIDTH + SIDEBAR_WIDTH / 2 - 50, 80, 100, 40)
+    elif button_name == "Plant2":
+        button_rect = pygame.Rect(BOARD_WIDTH + SIDEBAR_WIDTH / 2 - 50, 180, 100, 40)
+    elif button_name == "Cancel":
+        button_rect = pygame.Rect(BOARD_WIDTH + SIDEBAR_WIDTH / 2 - 50, 280, 100, 40)
+    
+    return button_rect.collidepoint(mouse_pos)
+
+def handle_planting(plant_class):
+    # Plant a plant at the clicked position if the game is not over
+    mouse_x: int
+    mouse_y: int
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    grid_x: int = mouse_x // GRID_SIZE
+    grid_y: int = mouse_y // GRID_SIZE
+
+    existing_plant: bool = any(plant.x == grid_x * GRID_SIZE
+                                and plant.y == grid_y * GRID_SIZE for plant in plants)
+    if not existing_plant and (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT):
+        # Plant a plant at the clicked position if it's within the grid
+        # check what button i pressed (passing a string or something maybe even pass a class or class obj?)
+        #instantiate that class obj
+        # should be good to go if i can name it new_plant
+        
+        new_plant = plant_class(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
+        if game_controller.get_coins() >= new_plant.cost:
+            game_controller.remove_coins(new_plant.cost)
+            game_controller.add(new_plant)
+            print(f"New Plant {new_plant.x, new_plant.y}. Health: {new_plant.health}")
+            # Reset planting flag
+            # If you want only one plant placed per side button click.
+            # global planting
+            # planting = False
+        else:
+            game_controller.play_sound('error.mp3', 0.15)
+    else:
+        game_controller.play_sound('error.mp3', 0.15)
 
 # While pygame is open
 while game_controller.get_status('app'):
+    mouse_pos = pygame.mouse.get_pos()
     zombies: list[Zombie] = game_controller.get_entities(Zombie)
     plants: list[Plant] = game_controller.get_entities(Plant)
     projectiles: list[Projectile] = game_controller.get_entities(Projectile)
+    # Clean below up
+    mouse_x: int
+    mouse_y: int
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    grid_x: int = mouse_x // GRID_SIZE
+    grid_y: int = mouse_y // GRID_SIZE
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_controller.set_app_status(False)
@@ -218,35 +297,29 @@ while game_controller.get_status('app'):
                     pygame.mixer.music.play()
                     begin_wave()
                     game_controller.set_game_status(True)
+            elif is_click_on_button("Cancel", mouse_pos):
+                planting = False
+                break
+            elif is_click_on_button("Plant1", mouse_pos):
+                planting = True
+                handle_plant_click(Plant)
+                break
+            elif is_click_on_button("Plant2", mouse_pos):
+                planting = True
+                handle_plant_click(BigPlant)
+                break
 
             # If mouse press while game is running (planting)
+            elif planting:
+                handle_planting(selected_plant)
             else:
-                # Plant a plant at the clicked position if the game is not over
-                mouse_x: int
-                mouse_y: int
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                grid_x: int = mouse_x // GRID_SIZE
-                grid_y: int = mouse_y // GRID_SIZE
-                existing_plant: bool = any(plant.x == grid_x * GRID_SIZE
-                                           and plant.y == grid_y * GRID_SIZE for plant in plants)
-                if not existing_plant and (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT):
-                    # Plant a plant at the clicked position if it's within the grid
-                    if game_controller.get_coins() >= PLANT_COST:
-                        game_controller.remove_coins(PLANT_COST)
-                        new_plant = Plant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
-                        game_controller.add(new_plant)
-                        print(f"New Plant {new_plant.x, new_plant.y}. Health: {new_plant.health}")
-                    else:
-                        game_controller.play_sound('error.mp3', 0.15)
-                else:
-                    game_controller.play_sound('error.mp3', 0.15)
+                game_controller.play_sound('error.mp3', 0.15)
 
     # While the game is running, draw entities, handle zombie movement, and allow zombies to attack
     if game_controller.get_status('game'):
         draw_grid_and_entities(game_controller.get_entities())
-        display_message(f"Coins: {game_controller.get_coins()}", WHITE, (60, 25))
-        display_message(f"Wave: {game_controller.get_wave() - 1}", WHITE, (60, 55))
+        display_message(f"Coins: {game_controller.get_coins()}", WHITE, (BOARD_WIDTH+SIDEBAR_WIDTH/2, 25))
+        display_message(f"Wave: {game_controller.get_wave() - 1}", WHITE, (BOARD_WIDTH+SIDEBAR_WIDTH/2, 55))
 
         if not game_controller.get_entities(Zombie):
             begin_wave()
