@@ -37,6 +37,7 @@ class MainMenuScreen(BaseScreen):
         super().__init__(screen_manager, display, title="Leafy Legions: Main Menu")
         self.sign_in_btn = None
         self.leaderboard_btn = None
+        self.almanac_btn = None
         self.quit_btn = None
 
     def render(self) -> None:
@@ -46,18 +47,9 @@ class MainMenuScreen(BaseScreen):
         # Background color
         self.display.fill(self.colors.BROWN)
 
-        # Render "Leafy Legions" message
-        # self.display_message(message="Leafy Legions",
-        #                      font_color=self.colors.GREEN,
-        #                      text_position=(self.display.get_width() // 2, 100),
-        #                      font_size=64
-        #                      )
-
-        # Add a logo to the top of the screen
-        self.display_image(image_filename="rellisLogo.png",
-                           image_position=(self.display.get_width() // 2, 125),
-                           image_size=(150, 169)
-                           )
+        # Calculate the vertical space occupied by the image
+        image_height = 169
+        image_margin_bottom = 10  # Additional space between the image and the buttons
 
         # Button Size
         button_width = 250
@@ -65,10 +57,15 @@ class MainMenuScreen(BaseScreen):
 
         # Button position calculations
         button_x = (self.display.get_width() - button_width) // 2
-        total_height = (button_height * 3) + (125 // 2)  # Total height of all buttons and spacing
-        sign_in_btn_y = (self.display.get_height() - total_height) // 2
-        leaderboard_btn_y = sign_in_btn_y + button_height + 100  # Adjusted positioning for the leaderboard button
-        quit_btn_y = leaderboard_btn_y + button_height + 100
+        total_height = (button_height * 4) + image_height + image_margin_bottom  # Total height including image and button spacing
+        button_gap = (self.display.get_height() - total_height) // 5  # Gap between each button and the image
+
+        # Calculate the y positions for each button
+        image_y = button_gap + 50  # Move image a bit down
+        sign_in_btn_y = image_y + image_height + image_margin_bottom + button_gap - 110  # Move buttons a bit up
+        leaderboard_btn_y = sign_in_btn_y + button_height + button_gap
+        almanac_btn_y = leaderboard_btn_y + button_height + button_gap
+        quit_btn_y = almanac_btn_y + button_height + button_gap
 
         # Render buttons and define as attributes
         if self.screen_manager.user_logged_in:
@@ -76,7 +73,6 @@ class MainMenuScreen(BaseScreen):
         else:
             sign_in_btn_label = "Sign In / Sign Up"
 
-        # Render buttons and define as attributes
         self.sign_in_btn = self.display_button(message=sign_in_btn_label,
                                                button_position=(button_x, sign_in_btn_y),
                                                button_size=(button_width, button_height)
@@ -85,10 +81,20 @@ class MainMenuScreen(BaseScreen):
                                                    button_position=(button_x, leaderboard_btn_y),
                                                    button_size=(button_width, button_height)
                                                    )
+        self.almanac_btn = self.display_button(message="Almanac",
+                                               button_position=(button_x, almanac_btn_y),
+                                               button_size=(button_width, button_height)
+                                               )
         self.quit_btn = self.display_button(message="Quit",
                                             button_position=(button_x, quit_btn_y),
                                             button_size=(button_width, button_height)
                                             )
+
+        # Add a logo to the top of the screen
+        self.display_image(image_filename="rellisLogo.png",
+                           image_position=(self.display.get_width() // 2, image_y),
+                           image_size=(150, 169)
+                           )
 
     def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -104,5 +110,7 @@ class MainMenuScreen(BaseScreen):
                 self.screen_manager.set_screen("SignInSignUpScreen")
         elif self.leaderboard_btn.collidepoint(mouse_pos):
             self.screen_manager.set_screen("LeaderboardScreen")
+        elif self.almanac_btn.collidepoint(mouse_pos):  # Handle click event for the almanac button
+            self.screen_manager.set_screen("AlmanacScreen")
         elif self.quit_btn.collidepoint(mouse_pos):
             self.screen_manager.quit()

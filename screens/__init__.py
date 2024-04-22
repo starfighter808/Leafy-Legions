@@ -9,8 +9,9 @@ from .sign_in_sign_up import SignInSignUpScreen
 from .you_lost import YouLostScreen
 from .gameplay import GameplayScreen
 from .leaderboard import LeaderboardScreen
+from .almanac import AlmanacScreen
 from .main_menu import MainMenuScreen
 
-__all__ = ['BaseScreen', 'SignInSignUpScreen', 'YouLostScreen', 'MainMenuScreen', 'GameplayScreen', 'LeaderboardScreen']
+__all__ = ['BaseScreen', 'SignInSignUpScreen', 'AlmanacScreen', 'YouLostScreen', 'MainMenuScreen', 'GameplayScreen', 'LeaderboardScreen']
 
 print("Loaded Module: Screens")

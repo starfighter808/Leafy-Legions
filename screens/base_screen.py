@@ -87,7 +87,8 @@ class BaseScreen:
                         text_position: tuple[float, float],
                         text_align: str = "center",
                         font_size: int = 36,
-                        alpha: int = 255
+                        alpha: int = 255,
+                        allowed_width: int = None
                         ) -> None:
         """
         Display a message on the current screen.
@@ -99,9 +100,43 @@ class BaseScreen:
             text_align (str): The alignment of the text. Default: center
             font_size (int): The font size of the text. Default: 36
             alpha (int): The alpha value for transparency. Default: 255 (fully opaque)
+            allowed_width (int): The allowed width for text wrapping
         """
         font = pygame.font.Font(None, font_size)
-        text: pygame.Surface = font.render(message, True, font_color)
+
+        # Wrap text if allowed_width is provided
+        if allowed_width:
+            wrapped_lines = []
+            space_width = font.size(' ')[0]
+            words = message.split(' ')
+            width, _ = font.size(message)
+            line = ''
+            for word in words:
+                word_width = font.size(word)[0]
+                if width + word_width < allowed_width:
+                    line += word + ' '
+                    width += word_width + space_width
+                else:
+                    wrapped_lines.append(line)
+                    line = word + ' '
+                    width = word_width + space_width
+            wrapped_lines.append(line)
+
+            wrapped_lines = [line for line in wrapped_lines if line.strip()]
+
+            # Render wrapped lines
+            text_lines = [font.render(line, True, font_color) for line in wrapped_lines]
+            line_height = font.get_height()
+            text_height = line_height * len(text_lines)
+
+            # Create a surface for wrapped text
+            text = pygame.Surface((allowed_width, text_height), pygame.SRCALPHA)
+            for i, text_line in enumerate(text_lines):
+                text.blit(text_line, (0, i * line_height))
+
+        else:
+            text = font.render(message, True, font_color)
+
         text.set_alpha(alpha)
         if text_align == 'center':
             text_rect = text.get_rect(center=text_position)
@@ -169,7 +204,7 @@ class BaseScreen:
     def display_image(self,
                       image_filename: str,
                       image_position: tuple[float, float],
-                      image_size: tuple[int, int]
+                      image_size: tuple[int, int] = None
                       ) -> None:
         """
         Display an image on the current screen.
@@ -180,6 +215,10 @@ class BaseScreen:
             image_size (tuple[int, int]): The size of the image (width, height).
         """
         image = pygame.image.load(f"./assets/images/{image_filename}")
-        image = pygame.transform.scale(image, image_size)
+        if image_size:
+            image = pygame.transform.scale(image, image_size)
         image_rect = image.get_rect(center=image_position)
         self.display.blit(image, image_rect)
+
+    def handle_key_events(self, key_entered, unicode_char):
+        pass

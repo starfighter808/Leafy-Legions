@@ -43,6 +43,7 @@ class SignInSignUpScreen(BaseScreen):
 
         self.sign_up_btn = None
         self.sign_in_btn = None
+        self.return_btn = None
 
     def render(self) -> None:
         """
@@ -97,6 +98,17 @@ class SignInSignUpScreen(BaseScreen):
                                                button_size=(button_width, button_height)
                                                )
 
+        # Calculate the center position for the "Return to Main Menu" button
+        return_button_width, return_button_height = 300, 70
+        return_button_x = (self.display.get_width() - return_button_width) // 2
+        return_button_y = button_y + 100  # Offset from the "Next" button
+
+        # Render "Return to Main Menu" button aligned to the center
+        self.return_btn = self.display_button(message="Return to Main Menu",
+                                              button_position=(return_button_x, return_button_y),
+                                              button_size=(return_button_width, return_button_height)
+                                              )
+
     def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
         """
         Handle click events on the sign-in/sign-up screen.
@@ -119,6 +131,8 @@ class SignInSignUpScreen(BaseScreen):
             elif self.sign_up_btn.collidepoint(mouse_pos):
                 self.screen_manager.set_screen("MainMenuScreen")
                 self.screen_manager.user_logged_in = True
+            elif self.return_btn.collidepoint(mouse_pos):
+                self.screen_manager.set_screen("MainMenuScreen")
 
     def handle_key_events(self, key_pressed: int, unicode_char: str) -> None:
         """
