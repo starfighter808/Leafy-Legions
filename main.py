@@ -21,7 +21,7 @@ from entities import __all__ as all_entities
 from managers import GameController
 
 # CONSTANTS
-DELAY_MS: int = 5 # Controls game speed, default is 50ms but lower is more fun.
+DELAY_MS: int = 5 # Game Speed, Default:50ms but lower = fun.
 GRID_WIDTH: int = 9
 GRID_HEIGHT: int = 5
 GRID_SIZE: int = 125
@@ -214,22 +214,12 @@ def draw_button(message: str, button_color: tuple[int, int, int],
     pygame.draw.rect(screen, button_color, button_rect, border_radius=5)
     screen.blit(button_text, button_rect)
 
+# Assigns plant class to global var, exists for later iteration.
 def handle_plant_click(plant_class: type):
-    # if plant_name in ["Plant1", "Plant2", "Plant3", "Cancel"]:
-    #     print(plant_name)
-    new_plant = Plant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
-    new_plant = BigPlant(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
-    if issubclass(plant_class, Plant):
-        global planting
-        planting = True
-        # Instantiate the selected plant class
-        new_plant = plant_class(game_controller, 0, 0)
-        print(f"Selected Plant: {plant_class.__name__}. Cost: {new_plant.cost}")
         global selected_plant
         selected_plant = plant_class
-    else:
-        print("Invalid plant selection")
 
+# Checks if mouse pos collides w/ side buttons.
 def is_click_on_button(button_name, mouse_pos):
     # Check if the mouse click is within the button's area
     if button_name == "Plant1":
@@ -252,11 +242,6 @@ def handle_planting(plant_class):
     existing_plant: bool = any(plant.x == grid_x * GRID_SIZE
                                 and plant.y == grid_y * GRID_SIZE for plant in plants)
     if not existing_plant and (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT):
-        # Plant a plant at the clicked position if it's within the grid
-        # check what button i pressed (passing a string or something maybe even pass a class or class obj?)
-        #instantiate that class obj
-        # should be good to go if i can name it new_plant
-        
         new_plant = plant_class(game_controller, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
         if game_controller.get_coins() >= new_plant.cost:
             game_controller.remove_coins(new_plant.cost)
@@ -277,7 +262,6 @@ while game_controller.get_status('app'):
     zombies: list[Zombie] = game_controller.get_entities(Zombie)
     plants: list[Plant] = game_controller.get_entities(Plant)
     projectiles: list[Projectile] = game_controller.get_entities(Projectile)
-    # Clean below up
     mouse_x: int
     mouse_y: int
     mouse_x, mouse_y = pygame.mouse.get_pos()
