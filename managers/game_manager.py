@@ -1,3 +1,11 @@
+"""
+Leafy Legions: GameManager
+
+This module contains the GameManager class
+for managing everything happening after the
+user presses on the "Start" button
+"""
+
 # Standard Imports
 import os
 
@@ -10,29 +18,28 @@ from entities import Plant, Zombie, Projectile
 Entity = Zombie | Plant | Projectile
 
 
-class GameController:
+class GameManager:
     """
-    The GameController class is responsible for managing entities on the game board,
+    The GameManager class is responsible for managing entities on the game board,
     along with the application and game running statuses.
     """
 
     def __init__(self) -> None:
         """
-        Initialize a GameController object.
+        Initialize a GameManager object.
         """
         self.__entities: dict[type[Entity], list[Entity]] = {
             Zombie: [],  # List to store instances of the Zombie class
             Plant: [],  # List to store instances of the Plant class
             Projectile: [],  # List to store instances of the Projectile class
         }
-        self.__app_running: bool = True
         self.__game_running: bool = False
         self.__coins: int = 25
         self.__wave: int = 1
 
     def __validate_entity(self, entity: Entity) -> type[Entity]:
         """s
-        Validate if an entity is of a registered type in the GameController and
+        Validate if an entity is of a registered type in the GameManager and
         return its base class.
 
         Args:
@@ -42,17 +49,17 @@ class GameController:
             type[Entity]: The base class of the entity.
 
         Raises:
-            ValueError: If the entity type is not registered in the GameController.
+            ValueError: If the entity type is not registered in the GameManager.
         """
         entity_type: type[Entity] = type(entity)
         for base_class in self.__entities:
             if issubclass(entity_type, base_class):
                 return base_class
-        raise ValueError(f"Entity type {entity_type} is not registered in GameController")
+        raise ValueError(f"Entity type {entity_type} is not registered in GameManager")
 
     def add(self, entity: Entity) -> None:
         """
-        Add an entity to the GameController.
+        Add an entity to the GameManager.
 
         Args:
             entity (Entity): The entity to be added.
@@ -62,7 +69,7 @@ class GameController:
 
     def remove(self, entity: Entity) -> None:
         """
-        Remove an entity from the GameController.
+        Remove an entity from the GameManager.
 
         Args:
             entity (Entity): The entity to be removed.
@@ -74,7 +81,7 @@ class GameController:
 
     def get_entities(self, entity_class: type[Entity] = None) -> list[Entity]:
         """
-        Get entities on the board or entities of a specific class registered in the GameController.
+        Get entities on the board or entities of a specific class registered in the GameManager.
         This will not return derived classes, such as SpeedyZombie.
 
         Args:
@@ -84,13 +91,13 @@ class GameController:
             list: A list containing all entities or entities of the specified class.
 
         Raises:
-            ValueError: If the specified entity_class is not registered in the GameController.
+            ValueError: If the specified entity_class is not registered in the GameManager.
         """
         if entity_class is None:
             return [entity for entities_list in self.__entities.values() for entity in entities_list]
         if entity_class in self.__entities:
             return self.__entities[entity_class]
-        raise ValueError(f"Entity class {entity_class} is not registered in GameController")
+        raise ValueError(f"Entity class {entity_class} is not registered in GameManager")
 
     def clear_entities(self, entity_class: type[Entity]) -> None:
         """
@@ -102,11 +109,11 @@ class GameController:
         if entity_class in self.__entities:
             self.__entities[entity_class].clear()
         else:
-            raise ValueError(f"Entity class {entity_class} is not registered in GameController")
+            raise ValueError(f"Entity class {entity_class} is not registered in GameManager")
 
     def reset(self) -> None:
         """
-        Reset the GameController by clearing all entities.
+        Reset the GameManager by clearing all entities.
         """
         for entity in self.__entities:
             self.clear_entities(entity)
@@ -124,41 +131,13 @@ class GameController:
         if not game_running:
             self.reset()
 
-    def set_app_status(self, app_running: bool) -> None:
-        """
-        Set the status of the app running.
-
-        Args:
-            app_running (bool): The status of the game.
-        """
-        self.__app_running = app_running
-
-    def get_status(self, status_type: str) -> bool:
-        """
-        Get either the game status or the running status.
-
-        Args:
-            status_type (str): Either 'app' or 'game' to indicate which status to retrieve.
-
-        Returns:
-            bool: The requested status.
-
-        Raises:
-            ValueError: If an invalid status_type is provided.
-        """
-        if status_type == 'app':
-            return self.__app_running
-        if status_type == 'game':
-            return self.__game_running
-        raise ValueError("Invalid status_type. Use 'app' or 'game'.")
-
-    def play_sound(self, effect_file: str, volume: float = 1.0) -> None:
+    def play_sound(self, effect_file: str, volume: float = 0.05) -> None:
         """
         Play sound effect
 
         Args:
             effect_file (str): Name of the sound effect file
-            volume (float): Volume of the sound effect (default = 1.0)
+            volume (float): Volume of the sound effect (default = 0.05)
 
         Raises:
             FileNotFoundError: If no sound is found
@@ -187,14 +166,14 @@ class GameController:
         Add users' coins
         """
         self.__coins += coins
-        self.play_sound('moneyfalls.ogg', 0.05)
+        self.play_sound('moneyfalls.ogg')
 
     def remove_coins(self, coins: int) -> None:
         """
         Remove users' coins
         """
         self.__coins -= coins
-        self.play_sound('moneyfalls.ogg', 0.05)
+        self.play_sound('moneyfalls.ogg')
 
     def get_wave(self) -> int:
         """

@@ -1,12 +1,20 @@
+"""
+Leafy Legions: SpeedyZombie (Zombie/Entity)
+
+This module contains the SpeedyZombie class,
+a type of Zombie/Entity on the Gameplay board
+"""
+
 # Standard Imports
 from typing import TYPE_CHECKING
 
 # Local Imports
-from . import Zombie
+from entities import Zombie
 
-# To import GameController without circular dependency errors
+# The following packages are imported only for type hinting.
+# They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameController
+    from managers import GameManager
 
 
 class SpeedyZombie(Zombie):
@@ -14,17 +22,16 @@ class SpeedyZombie(Zombie):
     A SpeedyZombie a type of Zombie with increased speed.
     """
 
-    def __init__(self, game_controller: 'GameController', x: int, y: int) -> None:
+    def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a SpeedyZombie object, inheriting from the Zombie class
 
         Args:
-            game_controller (GameController): An instance of the game controller managing the zombie.
+            game_manager (GameManager): An instance of the GameManager managing the zombie.
             x (int): The initial x-coordinate of the zombie.
             y (int): The initial y-coordinate of the zombie.
         """
-        super().__init__(game_controller, x, y)
+        super().__init__(game_manager, x, y)
         self.image = ["assets/images/speedyZombie.png"]
         self.image_size = (125, 125)
         self.speed: float = 3.0
-

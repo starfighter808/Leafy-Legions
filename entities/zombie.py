@@ -1,3 +1,10 @@
+"""
+Leafy Legions: Zombie (Entity)
+
+This module contains the Zombie class,
+a type of Entity on the Gameplay board
+"""
+
 # System Imports
 from typing import TYPE_CHECKING
 
@@ -5,12 +12,13 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from . import Entity
+from entities import Entity
 
-# To import GameController without circular dependency errors
+# The following packages are imported only for type hinting.
+# They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameController
-    from . import Plant
+    from managers import GameManager
+    from entities import Plant
 
 
 class Zombie(Entity):
@@ -18,16 +26,16 @@ class Zombie(Entity):
     A Zombie is a hostile entity that moves across the
     board and attacks plants on the game board.
     """
-    def __init__(self, game_controller: 'GameController', x: int, y: int) -> None:
+    def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a Zombie object.
 
         Args:
-            game_controller (GameController): An instance of the game controller managing the zombie.
+            game_manager (GameManager): An instance of the GameManager managing the zombie.
             x (int): The initial x-coordinate of the zombie.
             y (int): The initial y-coordinate of the zombie.
         """
-        super().__init__(game_controller, x, y, ["assets/images/zombie_1.png", "assets/images/zombie_2.png"])
+        super().__init__(game_manager, x, y, ["assets/images/zombie_1.png", "assets/images/zombie_2.png"])
         self.image_size: tuple[int, int] = (56, 112)
         self.health: int = 100
         self.speed: float = 1.0
@@ -62,7 +70,7 @@ class Zombie(Entity):
 
             if plant.health <= 0:
                 print(f"Plant {plant.x, plant.y} has died")
-                self.game_controller.remove(plant)
+                self.game_manager.remove(plant)
                 self.collided_with_plant = False
 
     def update_position(self) -> None:

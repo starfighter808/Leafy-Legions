@@ -1,9 +1,17 @@
+"""
+Leafy Legions: Entity
+
+This module contains the Entity class
+for managing every Entity in the Gameplay board
+"""
+
 # Standard Imports
 from typing import TYPE_CHECKING
 
-# To import GameController without circular dependency errors
+# The following packages are imported only for type hinting.
+# They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameController
+    from managers import GameManager
 
 
 class Entity:
@@ -11,17 +19,17 @@ class Entity:
     An Entity is anything on the game board
     """
 
-    def __init__(self, game_controller: 'GameController', x: int, y: int, image: list = None) -> None:
+    def __init__(self, game_manager: 'GameManager', x: int, y: int, image: list = None) -> None:
         """
         Initializes any Entity object.
 
         Args:
-            game_controller (GameController): An instance of the game controller managing the entity.
+            game_manager (GameManager): An instance of the GameManager managing the entity.
             x (int): The initial x-coordinate of the entity.
             y (int): The initial y-coordinate of the entity.
             image (str): The image of this entity
         """
-        self.game_controller = game_controller
+        self.game_manager = game_manager
         self.x = x
         self.y = y
         self.image = image
