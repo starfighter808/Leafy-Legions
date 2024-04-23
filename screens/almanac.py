@@ -21,14 +21,14 @@ if TYPE_CHECKING:
     from managers import ScreenManager
 
 
-def grab_attributes() -> dict[str, dict[str | any]]:
+def grab_attributes() -> dict[str, dict[str, any]]:
     """
     Grab attributes from all classes and subclasses of Plant and Zombie.
 
     Returns:
-        dict[str, dict[str | any]]: A dictionary containing class names as keys and their attributes as values.
+        dict[str, dict[str, any]]: A dictionary containing class names as keys and their attributes as values.
     """
-    all_attributes: dict[str, dict[str | any]] = {}
+    all_attributes: dict[str, dict[str, any]] = {}
     for entity_class in [Plant, Zombie]:
         subclasses = entity_class.__subclasses__()
         all_subclasses = [entity_class] + subclasses

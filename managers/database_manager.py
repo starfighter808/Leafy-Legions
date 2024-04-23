@@ -30,7 +30,6 @@ class DatabaseManager:
 
         # Caching to prevent spamming API calls
         self.high_scores_cache = []
-        self.user_login_cache = {}
 
     def get_high_scores(self) -> list[dict[str, str | int]]:
         """
@@ -42,7 +41,7 @@ class DatabaseManager:
         if self.high_scores_cache:
             return self.high_scores_cache
 
-        res = (self.client.table('users')
+        res = (self.client.table('user_data')
                .select('username', 'high_score')
                .order('high_score', desc=True)
                .execute())
@@ -68,7 +67,7 @@ class DatabaseManager:
             return False
 
         # Check if that username already exists
-        res = (self.client.table('users')
+        res = (self.client.table('user')
                .select('username')
                .eq('username', username)
                .execute())
@@ -79,14 +78,28 @@ class DatabaseManager:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         # Create the user using the hashed password
-        res = self.client.table('users').insert({
-            'username': username,
-            'password': hashed_password,
-            'high_score': 0
-        }).execute()
+        user_res = (self.client.table('user')
+                    .insert({
+                        'username': username,
+                        'password': hashed_password
+                    })
+                    .execute())
 
-        if len(res.data) > 0:
-            return True
+        # If user was properly created
+        if len(user_res.data) > 0:
+
+            # Create associated data table
+            user_data_res = (self.client.table('user_data')
+                             .insert({
+                                'username': username,
+                                'high_score': 0
+                             })
+                             .execute())
+
+            if len(user_data_res.data) > 0:
+                return True
+
+        return False
 
     def verify_login(self, username: str, password: str) -> bool:
         """
@@ -99,31 +112,25 @@ class DatabaseManager:
         Returns:
             bool: True if the login is valid, False otherwise.
         """
-
         if username == '' or password == '':
             return False
 
         # Find the password of the supplied username
-        if username in self.user_login_cache:
-            stored_hash = self.user_login_cache[username]
-        else:
-            # Find the password of the supplied username
-            res = (self.client.table('users')
-                   .select('password')
-                   .eq('username', username)
-                   .execute())
+        res = (self.client.table('user')
+               .select('password')
+               .eq('username', username)
+               .execute())
 
-            # If no password was found, return False
-            if len(res.data) == 0:
-                return False
+        # If no user/password was found, return False
+        if len(res.data) == 0:
+            return False
 
-            # Grab the hashed password returned
-            stored_hash = res.data[0]["password"]
+        # Grab the hashed password from the database
+        stored_hash = res.data[0]["password"]
 
-            # Cache the login data
-            self.user_login_cache[username] = stored_hash
-
-        # Use bcrypt to compare hashes and return True/False
+        # Use bcrypt to compare hashes:
+        # Returns True if hashes match
+        # Returns False if hashes don't match
         return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
 
     def update_high_score(self, username: str, new_high_score: int) -> bool:
@@ -137,10 +144,10 @@ class DatabaseManager:
         Returns:
             bool: True if the high score was updated successfully, False otherwise.
         """
-        res = (self.client.table('users')
+        res = (self.client.table('user_data')
                .update({
                     'high_score': new_high_score
-                })
+               })
                .eq('username', username)
                .execute())
 
