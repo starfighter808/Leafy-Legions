@@ -35,7 +35,7 @@ class Zombie(Entity):
             x (int): The initial x-coordinate of the zombie.
             y (int): The initial y-coordinate of the zombie.
         """
-        super().__init__(game_manager, x, y, ["assets/images/zombie_1.png", "assets/images/zombie_2.png"])
+        super().__init__(game_manager, x, y)
         self.image_size: tuple[int, int] = (56, 112)
         self.health: int = 100
         self.speed: float = 1.0
@@ -43,6 +43,11 @@ class Zombie(Entity):
         self.collided_with_plant: bool = False  # Flag to indicate collision with a plant
 
         self.__last_attack: int = 0
+        self.attributes = {
+            "name": "The Stumbler",
+            "images": ["assets/images/zombie_1.png", "assets/images/zombie_2.png"],
+            "description": "Slow but relentless, it overwhelms defenses with sheer numbers."
+        }
 
     def __can_attack(self) -> bool:
         """

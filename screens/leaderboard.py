@@ -55,21 +55,7 @@ class LeaderboardScreen(BaseScreen):
                              )
 
         # Sample leaderboard data, sorted by waves in descending order
-        self.leaderboard_data = [
-            ("Player 1", 80),
-            ("Player 2", 70),
-            ("Player 3", 60),
-            ("Player 4", 55),
-            ("Player 5", 50),
-            ("Player 6", 45),
-            ("Player 7", 40),
-            ("Player 8", 35),
-            ("Player 9", 30),
-            ("Player 10", 25),
-            ("Player 11", 20),
-            ("Player 12", 15),
-            ("Player 13", 10)
-        ]
+        self.leaderboard_data = self.database_manager.get_high_scores()
 
         # Calculate the range of entries to display based on the current page number
         start_index = (self.current_page - 1) * self.entries_per_page
@@ -78,7 +64,9 @@ class LeaderboardScreen(BaseScreen):
 
         # Display leaderboard data
         x, y = 360, 160
-        for idx, (username, waves) in enumerate(display_data, start=start_index + 1):
+        for idx, entry in enumerate(display_data, start=start_index + 1):
+            username = entry["username"]
+            waves = entry["high_score"]
             line = f"{idx}. {username}: Waves {waves}"
             self.display_message(message=line,
                                  font_color=self.colors.WHITE,

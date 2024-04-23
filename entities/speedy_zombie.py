@@ -32,6 +32,11 @@ class SpeedyZombie(Zombie):
             y (int): The initial y-coordinate of the zombie.
         """
         super().__init__(game_manager, x, y)
-        self.image = ["assets/images/speedyZombie.png"]
         self.image_size = (125, 125)
         self.speed: float = 3.0
+
+        self.attributes = {
+            "name": "The Sprinter",
+            "images": ["assets/images/speedyZombie.png"],
+            "description": "A blur of decayed flesh, dashing with alarming speed to catch its prey."
+        }

@@ -95,9 +95,9 @@ class GameplayScreen(BaseScreen):
             entity_class: type = getattr(entities_module, entity_name)  # Get Class from modules
 
             # Create an instance of the entity's Class for access to the image attrib
-            entity_instance = entity_class(self.game_manager, 0, 0)
+            entity_instance = entity_class(None, 0, 0)
 
-            image_paths: list = entity_instance.image
+            image_paths: list = entity_instance.attributes["images"]
             if image_paths:
                 images = []
                 for image_path in image_paths:
@@ -145,7 +145,6 @@ class GameplayScreen(BaseScreen):
             y = random.randint(0, 4) * GRID_SIZE
             new_zombie = role(self.game_manager, x, y)
             self.game_manager.add(new_zombie)
-            print((y) // GRID_SIZE)
 
     def draw_grid_and_entities(self, objs: list[Zombie | Plant | Projectile]) -> None:
         """
@@ -244,6 +243,7 @@ class GameplayScreen(BaseScreen):
 
         # Check if any zombie go outside the screen
         if any(zombie.x <= -GRID_SIZE for zombie in self.zombies):
+            wave = self.game_manager.get_wave()-1
             self.game_manager.set_game_status(False)
 
             # Add a fade-to-black effect when the game is over
@@ -256,5 +256,5 @@ class GameplayScreen(BaseScreen):
                 pygame.mixer.music.fadeout(500)
                 pygame.display.flip()
                 pygame.time.delay(15)
-
+            self.database_manager.update_high_score(self.screen_manager.user_logged_in, wave)
             self.screen_manager.set_screen("YouLostScreen")

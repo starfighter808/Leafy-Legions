@@ -7,11 +7,14 @@ for managing every screen view in the application
 
 # Standard Imports
 import inspect
+import os
 
 # Library Imports
+from dotenv import load_dotenv
 import pygame
 
 # Local Imports
+from managers import DatabaseManager
 import screens
 
 
@@ -31,19 +34,25 @@ class ScreenManager:
     A class to manage different screens in the game.
 
     Attributes:
-        current_screen: The current screen being displayed.
-        valid_screens: A list of valid screen classes.
+        display (pygame.Surface): The current pygame display being used to render
+        current_screen (type[BaseScreen]): The current screen class being displayed.
+        valid_screens (list[str]): A list of valid screen classes.
+        user_logged_in (str): If the user has validated their login
     """
-
     def __init__(self, display: pygame.Surface) -> None:
         """
         Initialize the ScreenManager with an empty current_screen and fetch valid screen classes.
+
+        Args:
+            display (pygame.Surface): The current pygame display being used to render
         """
+        load_dotenv()
         self.__running = True
+        self.database_manager = DatabaseManager(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
         self.display = display
         self.current_screen = None
         self.valid_screens: list[str] = _get_valid_screens()
-        self.user_logged_in = False
+        self.user_logged_in = None
 
     def is_running(self):
         """

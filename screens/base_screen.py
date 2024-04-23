@@ -40,6 +40,7 @@ class BaseScreen:
         self.screen_manager = screen_manager
         self.display = display
         self.colors = ColorManager
+        self.database_manager = self.screen_manager.database_manager
         pygame.display.set_caption(title)
 
         self.return_btn = None
@@ -214,11 +215,14 @@ class BaseScreen:
             image_position (tuple[float, float]): The position of the image (x, y).
             image_size (tuple[int, int]): The size of the image (width, height).
         """
-        image = pygame.image.load(f"./assets/images/{image_filename}")
+        if image_filename.startswith('assets'):
+            image = pygame.image.load(image_filename)
+        else:
+            image = pygame.image.load(f"./assets/images/{image_filename}")
         if image_size:
             image = pygame.transform.scale(image, image_size)
         image_rect = image.get_rect(center=image_position)
         self.display.blit(image, image_rect)
 
-    def handle_key_events(self, key_entered, unicode_char):
+    def handle_key_events(self, key_pressed: int, unicode_char: str) -> None:
         pass

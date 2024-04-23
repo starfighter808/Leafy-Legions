@@ -35,12 +35,21 @@ class Plant(Entity):
             x (int): The initial x-coordinate of the plant.
             y (int): The initial y-coordinate of the plant.
         """
-        super().__init__(game_manager, x, y, ["assets/images/plant.png"])
+        super().__init__(game_manager, x, y)
         self.health: int = 150  # Health of the plant
 
         self.attack_speed: float = 1.0
         self.__last_attack: int = 0
-        self.game_manager.play_sound('plant.ogg')
+        if game_manager:
+            self.game_manager.play_sound('plant.ogg')
+
+        self.attributes = {
+            "name": "The Cowboy",
+            "images": ["assets/images/plant.png"],
+            "description": "A sharpshooting sentinel with a ten-gallon hat and a lasso, it wrangles foes while "
+                           "providing cover. Agile and precise, it turns the tide with its quick reflexes and summons"
+                           "allies to stampede to victory!"
+        }
 
     def __can_attack(self) -> bool:
         """
@@ -60,5 +69,5 @@ class Plant(Entity):
             self.__last_attack = pygame.time.get_ticks()
             self.game_manager.play_sound('shoot.ogg')
 
-            new_projectile = Projectile(self.game_manager, self.x+75, self.y)
+            new_projectile = Projectile(self.game_manager, self.x + 75, self.y)
             self.game_manager.add(new_projectile)

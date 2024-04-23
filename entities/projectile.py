@@ -32,10 +32,14 @@ class Projectile(Entity):
             x (int): The initial x-coordinate of the projectile.
             y (int): The initial y-coordinate of the projectile.
         """
-        super().__init__(game_manager, x, y, ["assets/images/projectile.png"])
+        super().__init__(game_manager, x, y)
         self.image_size: tuple[int, int] = (25, 25)
         self.speed: float = 5.0
         self.collided_with_zombie: bool = False  # Flag to indicate collision with a plant
+
+        self.attributes = {
+            "images": ["assets/images/projectile.png"]
+        }
 
     def attack_zombie(self, zombie: Zombie):
         """

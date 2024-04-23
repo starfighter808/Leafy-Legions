@@ -1,3 +1,10 @@
+"""
+Leafy Legions: AlmanacScreen
+
+This module contains the AlmanacScreen class
+for managing functions used in the Almanac section of the application
+"""
+
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -5,12 +12,33 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
+from entities import Plant, Zombie
 from screens import BaseScreen
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
     from managers import ScreenManager
+
+
+def grab_attributes() -> dict[str, dict[str | any]]:
+    """
+    Grab attributes from all classes and subclasses of Plant and Zombie.
+
+    Returns:
+        dict[str, dict[str | any]]: A dictionary containing class names as keys and their attributes as values.
+    """
+    all_attributes: dict[str, dict[str | any]] = {}
+    for entity_class in [Plant, Zombie]:
+        subclasses = entity_class.__subclasses__()
+        all_subclasses = [entity_class] + subclasses
+        for subclass in all_subclasses:
+            instance = subclass(None, 0, 0)  # Instantiate the class
+            attributes = instance.attributes
+            if 'images' in attributes:
+                attributes['images'] = attributes['images'][0]  # Grab the first image
+            all_attributes[subclass.__name__] = attributes
+    return all_attributes
 
 
 class AlmanacScreen(BaseScreen):
@@ -42,53 +70,41 @@ class AlmanacScreen(BaseScreen):
 
         self.display_message(message="Almanac",
                              font_color=self.colors.GREEN,
-                             text_position=(self.display.get_width() // 2, 100),
+                             text_position=(self.display.get_width() // 2, 50),
                              font_size=64
                              )
 
-        # Sample Almanac data, sorted by waves in descending order
-        self.almanac_data = [
-            ("The Cowboy",
-             "plant.png",
-             "A sharpshooting sentinel with a ten-gallon hat and a lasso, it wrangles foes while providing cover. "
-             "Agile and precise, it turns the tide with its quick reflexes and summons allies to stampede to victory!"
-            ),
-            ("The Sprinter",
-             "speedyZombie.png",
-             "A decaying blur of tattered clothes and gnashing teeth, sprinting towards prey with lightning speed."
-                "Fragile but swift, it hunts down survivors with relentless agility, "
-                "posing a constant threat to the unprepared."
-             )
-        ]
+        self.almanac_data = grab_attributes()
 
         # Calculate the range of entries to display based on the current page number
-        start_index = (self.current_page - 1)
+        start_index = self.current_page - 1
         end_index = start_index + 1
-        display_data = self.almanac_data[start_index:end_index]
+        display_data = list(self.almanac_data.values())[start_index:end_index]
 
         # # Display almanac data
-        x, y = 360, 430
-        for idx, (plant_name, plant_img, plant_desc) in enumerate(display_data, start=start_index + 1):
+        x, y = 360, 330
+        for attributes in display_data:
             # Add the almanac background
             self.display_image(image_filename="almanac.png",
-                               image_position=(self.display.get_width() // 2 - 15, y)
+                               image_position=(self.display.get_width() // 2, y),
+                               image_size=(396, 474)
                                )
 
-            self.display_message(message=plant_name,
+            self.display_message(message=attributes["name"],
                                  font_color=self.colors.WHITE,
-                                 text_position=(self.display.get_width() // 2, y - 283)
+                                 text_position=(self.display.get_width() // 2, y - 220)
                                  )
 
-            self.display_image(image_filename=plant_img,
-                               image_position=(self.display.get_width() // 2, y - 160),
+            self.display_image(image_filename=attributes["images"],
+                               image_position=(self.display.get_width() // 2, y - 85),
                                image_size=(140, 140)
                                )
 
-            self.display_message(message=plant_desc,
+            self.display_message(message=attributes["description"],
                                  font_color=self.colors.WHITE,
-                                 text_position=(self.display.get_width() // 4 + 95, y - 45),
+                                 text_position=(self.display.get_width() // 4 + 75, y + 40),
                                  text_align="topleft",
-                                 allowed_width=340,
+                                 allowed_width=370,
                                  font_size=32
                                  )
 
@@ -150,6 +166,5 @@ class AlmanacScreen(BaseScreen):
             self.screen_manager.set_screen("MainMenuScreen")
         if self.previous_btn.collidepoint(mouse_pos) and self.current_page > 1:
             self.current_page -= 1
-        elif (self.next_btn.collidepoint(mouse_pos) and
-              (self.current_page) < len(self.almanac_data)):
+        elif self.next_btn.collidepoint(mouse_pos) and self.current_page < len(self.almanac_data):
             self.current_page += 1

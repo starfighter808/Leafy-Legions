@@ -1,3 +1,10 @@
+"""
+Leafy Legions: SignInSignUpScreen
+
+This module contains the SignInSignUpScreen class
+for managing the Sign In and Sign Up screen in the application
+"""
+
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -44,6 +51,7 @@ class SignInSignUpScreen(BaseScreen):
         self.sign_up_btn = None
         self.sign_in_btn = None
         self.return_btn = None
+        self.error_text = ''
 
     def render(self) -> None:
         """
@@ -82,6 +90,10 @@ class SignInSignUpScreen(BaseScreen):
                          2
                          )
         self.display.blit(self.password_surface, (self.input_rect_password.x + 5, self.input_rect_password.y + 5))
+
+        if self.error_text:
+            error_text = self.font.render(self.error_text, True, self.colors.RED)
+            self.display.blit(error_text, (self.display.get_width() // 2 - error_text.get_width() // 2, 350))
 
         # Render Sign In and Sign Up buttons horizontally
         button_width, button_height = 150, 50
@@ -126,11 +138,24 @@ class SignInSignUpScreen(BaseScreen):
             self.username_active = False
             self.password_active = False
             if self.sign_in_btn.collidepoint(mouse_pos):
-                self.screen_manager.set_screen("MainMenuScreen")
-                self.screen_manager.user_logged_in = True
+                if self.database_manager.verify_login(self.username_text, self.password_text):
+                    self.screen_manager.set_screen("MainMenuScreen")
+                    self.screen_manager.user_logged_in = self.username_text
+                else:
+                    if self.username_text == '' or self.password_text == '':
+                        self.error_text = "Username and password cannot be blank"
+                    else:
+                        self.error_text = "Invalid username or password"
+
             elif self.sign_up_btn.collidepoint(mouse_pos):
-                self.screen_manager.set_screen("MainMenuScreen")
-                self.screen_manager.user_logged_in = True
+                if self.database_manager.create_user(self.username_text, self.password_text):
+                    self.screen_manager.set_screen("MainMenuScreen")
+                    self.screen_manager.user_logged_in = self.username_text
+                else:
+                    if self.username_text == '' or self.password_text == '':
+                        self.error_text = "Username and password cannot be blank"
+                    else:
+                        self.error_text = "Username already exists"
             elif self.return_btn.collidepoint(mouse_pos):
                 self.screen_manager.set_screen("MainMenuScreen")
 
