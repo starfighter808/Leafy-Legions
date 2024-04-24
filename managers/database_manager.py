@@ -153,9 +153,17 @@ class DatabaseManager:
 
         # Update cache if necessary
         if len(res.data) > 0:
-            for user in self.high_scores_cache:
-                if user['username'] == username:
-                    user['high_score'] = new_high_score
+            user_found = False
+            for obj in self.high_scores_cache:
+                if obj['username'] == username:
+                    obj['high_score'] = new_high_score
+                    user_found = True
+
+            if not user_found:
+                self.high_scores_cache.append({
+                    "username": username,
+                    "high_score": new_high_score
+                })
 
             # Sort cached data
             self.high_scores_cache.sort(key=lambda x: x['high_score'], reverse=True)
