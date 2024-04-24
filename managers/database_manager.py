@@ -7,7 +7,7 @@ for managing the communication to Supabase
 
 # Library Imports
 import bcrypt
-import supabase
+from supabase import create_client, Client
 
 
 class DatabaseManager:
@@ -25,7 +25,7 @@ class DatabaseManager:
         """
         self.supabase_url = supabase_url
         self.supabase_key = supabase_key
-        self.client = supabase.Client(supabase_url, supabase_key)
+        self.client: Client = create_client(supabase_url, supabase_key)
         print("Initialized Database Connection")
 
         # Caching to prevent spamming API calls
