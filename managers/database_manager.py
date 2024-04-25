@@ -42,11 +42,12 @@ class DatabaseManager:
         res = self.database.child('user_data').order_by_child('high_score').get()
 
         if isinstance(res, dict):  # Check if the result is a dictionary
-            self.high_scores_cache = []
             for username, user_data in res.items():  # Extract username and user data
                 if isinstance(user_data, dict):
                     high_score = user_data.get("high_score", 0)
-                    self.high_scores_cache.append({"username": username, "high_score": high_score})
+                    self.high_scores_cache.append({
+                        "username": username, "high_score": high_score
+                    })
                 else:
                     print("Unexpected data structure for user data:", user_data)
         else:
@@ -108,33 +109,40 @@ class DatabaseManager:
         # Use bcrypt to compare hashes (true means working):
         return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
 
-    def update_high_score(self, username: str, new_high_score: int) -> bool:
+    def update_high_score(self, username: str, new_high_score: int) -> None:
         """
         Update the high score based on the username
 
         Args:
             username (str): The username of the user.
             new_high_score (int): The new high score to set.
-
-        Returns:
-            bool: True if the high score was updated successfully, False otherwise.
         """
+        # If the username is blank, do nothing
         if not username:
-            return False
+            return
 
+        # If there is no data in the database for this user, do nothing
         user_data_ref = self.database.child('user_data').child(username)
         if not user_data_ref.get():
-            return False
+            return
 
-        user_data_ref.update({'high_score': new_high_score})
+        # If the high score is greater than existing score, do nothing
+        if user_data_ref.get()["high_score"] > new_high_score:
+            return
 
-        # Update cache if necessary
+        # Update the database
+        user_data_ref.update({
+            'high_score': new_high_score
+        })
+
+        # Update the cache
         user_found = False
         for obj in self.high_scores_cache:
             if obj['username'] == username:
                 obj['high_score'] = new_high_score
                 user_found = True
 
+        # If the user is not in the cache, add them
         if not user_found:
             self.high_scores_cache.append({
                 "username": username,
@@ -143,5 +151,3 @@ class DatabaseManager:
 
         # Sort cached data
         self.high_scores_cache.sort(key=lambda x: x['high_score'], reverse=True)
-
-        return True
