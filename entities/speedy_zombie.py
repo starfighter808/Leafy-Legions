@@ -31,7 +31,7 @@ class SpeedyZombie(Zombie):
         """
         super().__init__(game_manager, x, y)
         self.image_size = (125, 125)
-        self.speed: float = 3.0
+        self.speed: float = 4.0
 
         self.attributes = {
             "name": "The Sprinter",
