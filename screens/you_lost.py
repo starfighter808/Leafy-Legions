@@ -4,7 +4,6 @@ Leafy Legions: YouLostScreen
 This module contains the YouLostScreen class
 for managing the "You Lost!" screen after losing the game
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -25,7 +24,6 @@ class YouLostScreen(BaseScreen):
     The YouLostScreens renders the "You Lost!"
     screen after losing in the GameplayScreen
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: pygame.Surface) -> None:
         """
         Initialize the You Lost! screen.

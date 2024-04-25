@@ -4,7 +4,6 @@ Leafy Legions: Zombie (Entity)
 This module contains the Zombie class,
 a type of Entity on the Gameplay board
 """
-
 # System Imports
 from typing import TYPE_CHECKING
 
@@ -82,6 +81,5 @@ class Zombie(Entity):
         """
         Update the zombie's position.
         """
-        # Update the zombie's position
         if not self.collided_with_plant and self.x > -125:  # Check if not collided with a plant or out of bounds
             self.x -= self.speed

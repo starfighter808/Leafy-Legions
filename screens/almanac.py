@@ -4,7 +4,6 @@ Leafy Legions: AlmanacScreen
 This module contains the AlmanacScreen class
 for managing functions used in the Almanac section of the application
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -46,7 +45,6 @@ class AlmanacScreen(BaseScreen):
     The AlmanacScreen renders the "Almanac"
     section of the application
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: pygame.Surface) -> None:
         """
         Initialize the Almanac screen.

@@ -4,7 +4,6 @@ Leafy Legions: MainMenuScreen
 This module contains the MainMenuScreen class
 for managing the start-up screen in the game
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -25,7 +24,6 @@ class MainMenuScreen(BaseScreen):
     The MainMenuScreen renders the
     starting page of the application
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: pygame.Surface) -> None:
         """
         Initialize the Main Menu screen.

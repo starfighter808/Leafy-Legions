@@ -4,7 +4,6 @@ Leafy Legions: SignInSignUpScreen
 This module contains the SignInSignUpScreen class
 for managing the Sign In and Sign Up screen in the application
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -27,7 +26,6 @@ class SignInSignUpScreen(BaseScreen):
     section of the application. It only displays if the
     user is not already logged into the application.
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: pygame.Surface) -> None:
         """
         Initialize the Sign In/Sign Up screen.
@@ -164,8 +162,8 @@ class SignInSignUpScreen(BaseScreen):
         Handle key press events on the sign-in/sign-up screen.
 
         Args:
-            key_pressed (int): The key on the keyboard that was pressed to trigger the event.
-            unicode_char (str): The unicode character, if one was created.
+            key_pressed (int): The key pressed on the keyboard in integer form
+            unicode_char (str): The value that the key represents
         """
         if self.username_active:
             if key_pressed == pygame.K_BACKSPACE:

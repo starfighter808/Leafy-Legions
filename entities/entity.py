@@ -4,7 +4,6 @@ Leafy Legions: Entity
 This module contains the Entity class
 for managing every Entity in the Gameplay board
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -18,7 +17,6 @@ class Entity:
     """
     An Entity is anything on the game board
     """
-
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes any Entity object.

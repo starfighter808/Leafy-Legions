@@ -4,7 +4,6 @@ Leafy Legions: LeaderboardScreen
 This module contains the LeaderboardScreen class
 for managing the leaderboard screen in the game
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -25,7 +24,6 @@ class LeaderboardScreen(BaseScreen):
     The LeaderboardScreen renders the "Leaderboard"
     section of the application
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: pygame.Surface) -> None:
         """
         Initialize the Leaderboard screen.

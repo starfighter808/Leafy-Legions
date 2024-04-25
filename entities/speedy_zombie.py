@@ -4,7 +4,6 @@ Leafy Legions: SpeedyZombie (Zombie/Entity)
 This module contains the SpeedyZombie class,
 a type of Zombie/Entity on the Gameplay board
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -21,7 +20,6 @@ class SpeedyZombie(Zombie):
     """
     A SpeedyZombie a type of Zombie with increased speed.
     """
-
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a SpeedyZombie object, inheriting from the Zombie class

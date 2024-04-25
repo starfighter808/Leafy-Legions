@@ -51,7 +51,6 @@ class GameplayScreen(BaseScreen):
     """
     The GameplayScreen renders the game itself
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: pygame.Surface) -> None:
         """
         Initialize the Gameplay screen.
@@ -115,7 +114,6 @@ class GameplayScreen(BaseScreen):
         Start a new wave of zombies after
         the current one has ended
         """
-
         # Remove all projectiles
         self.game_manager.clear_entities(Projectile)
 
@@ -183,6 +181,12 @@ class GameplayScreen(BaseScreen):
                     self.display.blit(images[0], (obj.x, obj.y + 100))
 
     def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
+        """
+        Handle events on the gameplay screen.
+
+        Args:
+            mouse_pos (Tuple[int, int]): The position of the mouse cursor.
+        """
         mouse_x: int = mouse_pos[0]
         mouse_y: int = mouse_pos[1]
         grid_x: int = mouse_x // GRID_SIZE
@@ -204,6 +208,9 @@ class GameplayScreen(BaseScreen):
             self.game_manager.play_sound('error.mp3', 0.15)
 
     def render(self) -> None:
+        """
+        Render the gameplay screen.
+        """
         self.display.fill(self.colors.BROWN)
         self.draw_grid_and_entities(self.game_manager.get_entities())
         self.display_message(message=f"Coins: {self.game_manager.get_coins()}",

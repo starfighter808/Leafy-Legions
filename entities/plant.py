@@ -4,7 +4,6 @@ Leafy Legions: Plant (Entity)
 This module contains the Plant class,
 a type of Entity on the Gameplay board
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -25,7 +24,6 @@ class Plant(Entity):
     A Plant is a stationary entity that is placed
     on the game board to defend against zombies.
     """
-
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a Plant object.

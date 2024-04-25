@@ -4,7 +4,6 @@ Leafy Legions: BaseScreen
 This module contains the BaseScreen class
 for managing functions used in any Screen in the game
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -24,7 +23,6 @@ class BaseScreen:
     """
     A base class for all screens in the game.
     """
-
     def __init__(self,
                  screen_manager: 'ScreenManager',
                  display: pygame.Surface,
@@ -225,4 +223,12 @@ class BaseScreen:
         self.display.blit(image, image_rect)
 
     def handle_key_events(self, key_pressed: int, unicode_char: str) -> None:
-        pass
+        """
+        Render when a key is pressed on the keyboard in the
+        event that it is not registered by other Screen
+
+        Args:
+            key_pressed (int): The key pressed on the keyboard in integer form
+            unicode_char (str): The value that the key represents
+        """
+

@@ -5,6 +5,7 @@ This module contains the ColorManager class
 for managing a list of common colors
 """
 
+
 class ColorManager:
     """
     A list of common colors for the various screens

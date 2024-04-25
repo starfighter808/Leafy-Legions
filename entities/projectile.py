@@ -4,7 +4,6 @@ Leafy Legions: Projectile (Entity)
 This module contains the Projectile class,
 a type of Entity on the Gameplay board
 """
-
 # Standard Imports
 from typing import TYPE_CHECKING
 
@@ -22,13 +21,12 @@ class Projectile(Entity):
     A Projectile is a moving entity that is shot
     from plants on the game board to hurt zombies.
     """
-
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a Projectile object.
 
         Args:
-            game_manager (GameManager): An instance of the GameMnaager managing the projectile.
+            game_manager (GameManager): An instance of the GameManager managing the projectile.
             x (int): The initial x-coordinate of the projectile.
             y (int): The initial y-coordinate of the projectile.
         """

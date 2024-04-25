@@ -5,7 +5,6 @@ This module contains the GameManager class
 for managing everything happening after the
 user presses on the "Start" button
 """
-
 # Standard Imports
 import os
 
@@ -23,7 +22,6 @@ class GameManager:
     The GameManager class is responsible for managing entities on the game board,
     along with the application and game running statuses.
     """
-
     def __init__(self) -> None:
         """
         Initialize a GameManager object.
@@ -38,7 +36,7 @@ class GameManager:
         self.__wave: int = 1
 
     def __validate_entity(self, entity: Entity) -> type[Entity]:
-        """s
+        """
         Validate if an entity is of a registered type in the GameManager and
         return its base class.
 
@@ -142,7 +140,6 @@ class GameManager:
         Raises:
             FileNotFoundError: If no sound is found
         """
-
         sound_path = f"./assets/sounds/{effect_file}"
         if self.__game_running:
             if os.path.exists(sound_path):
