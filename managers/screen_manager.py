@@ -4,13 +4,10 @@ Leafy Legions: ScreenManager
 This module contains the ScreenManager class
 for managing every screen view in the application
 """
-
 # Standard Imports
 import inspect
-import os
 
 # Library Imports
-from dotenv import load_dotenv
 import pygame
 
 # Local Imports
@@ -46,9 +43,8 @@ class ScreenManager:
         Args:
             display (pygame.Surface): The current pygame display being used to render
         """
-        load_dotenv()
         self.__running = True
-        self.database_manager = DatabaseManager(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
+        self.database_manager = DatabaseManager()
         self.display = display
         self.current_screen = None
         self.valid_screens: list[str] = _get_valid_screens()
