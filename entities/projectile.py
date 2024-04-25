@@ -1,12 +1,20 @@
+"""
+Leafy Legions: Projectile (Entity)
+
+This module contains the Projectile class,
+a type of Entity on the Gameplay board
+"""
+
 # Standard Imports
 from typing import TYPE_CHECKING
 
 # Local Imports
-from . import Entity, Zombie
+from entities import Entity, Zombie
 
-# To import GameController without circular dependency errors
+# The following packages are imported only for type hinting.
+# They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameController
+    from managers import GameManager
 
 
 class Projectile(Entity):
@@ -15,19 +23,23 @@ class Projectile(Entity):
     from plants on the game board to hurt zombies.
     """
 
-    def __init__(self, game_controller: 'GameController', x: int, y: int) -> None:
+    def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a Projectile object.
 
         Args:
-            game_controller (GameController): An instance of the game controller managing the projectile.
+            game_manager (GameManager): An instance of the GameMnaager managing the projectile.
             x (int): The initial x-coordinate of the projectile.
             y (int): The initial y-coordinate of the projectile.
         """
-        super().__init__(game_controller, x, y, ["assets/images/projectile.png"])
+        super().__init__(game_manager, x, y)
         self.image_size: tuple[int, int] = (25, 25)
         self.speed: float = 5.0
         self.collided_with_zombie: bool = False  # Flag to indicate collision with a plant
+
+        self.attributes = {
+            "images": ["assets/images/projectile.png"]
+        }
 
     def attack_zombie(self, zombie: Zombie):
         """
@@ -41,11 +53,11 @@ class Projectile(Entity):
 
         if zombie.health <= 0:
             print(f"Zombie {zombie.x, zombie.y} has died")
-            self.game_controller.remove(zombie)
-            self.game_controller.add_coins(10)
+            self.game_manager.remove(zombie)
+            self.game_manager.add_coins(10)
 
-        self.game_controller.play_sound('hit.ogg', 0.05)
-        self.game_controller.remove(self)
+        self.game_manager.play_sound('hit.ogg')
+        self.game_manager.remove(self)
 
     def update_position(self) -> None:
         """
@@ -54,4 +66,4 @@ class Projectile(Entity):
         if self.x < 1125:  # Check if the projectile is not out of bounds
             self.x += self.speed
         else:
-            self.game_controller.remove(self)
+            self.game_manager.remove(self)
