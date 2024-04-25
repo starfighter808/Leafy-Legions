@@ -1,7 +1,7 @@
 """
-Leafy Legions: HulkingZombie (Zombie/Entity)
+Leafy Legions: PolymorphZombie (Zombie/Entity)
 
-This module contains the HulkingZombie class,
+This module contains the PolymorphZombie class,
 a type of Zombie/Entity on the Gameplay board
 """
 # Standard Imports
@@ -16,13 +16,13 @@ if TYPE_CHECKING:
     from managers import GameManager
 
 
-class HulkingZombie(Zombie):
+class PolymorphZombie(Zombie):
     """
-    A Hulking Zombie a type of Zombie with increased Health but Lower Speed.
+    A Polymorph Zombie a type of Zombie with increased Health and Speed.
     """
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
-        Initializes a Hulking Zombie object, inheriting from the Zombie class
+        Initializes a Polymorph Zombie object, inheriting from the Zombie class
 
         Args:
             game_manager (GameManager): An instance of the GameManager managing the zombie.
@@ -31,11 +31,11 @@ class HulkingZombie(Zombie):
         """
         super().__init__(game_manager, x, y)
         self.image_size = (125, 125)
-        self.speed: float = 1.75
-        self.health: int = 500
+        self.speed: float = 3
+        self.health: int = 600
 
         self.attributes = {
-            "name": "Hulking Zombie",
-            "images": ["assets/images/hulk_zombie.png"],
+            "name": "Polymorph Zombie",
+            "images": ["assets/images/polymorph_zombie.png"],
             "description": "???"
         }

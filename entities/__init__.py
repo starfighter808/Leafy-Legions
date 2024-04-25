@@ -10,7 +10,7 @@ from .plant import Plant
 from .speedy_zombie import SpeedyZombie
 from .hulking_zombie import HulkingZombie
 from .rose_plant import RosePlant 
-from .Polymorph_Zombie import PolymorphZombie
+from .polymorph_zombie import PolymorphZombie
 
 __all__ = ['Entity', 'Plant', 'Zombie', 'SpeedyZombie', 'Projectile', 'HulkingZombie', 'RosePlant', 'PolymorphZombie']
 

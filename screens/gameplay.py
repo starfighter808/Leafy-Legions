@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from entities import Plant, Projectile, SpeedyZombie, Zombie
+from entities import Plant, Projectile, SpeedyZombie, Zombie, PolymorphZombie, HulkingZombie
 from entities import __all__ as all_entities
 from managers import ColorManager, GameManager
 from screens import BaseScreen
@@ -47,6 +47,37 @@ def scale_background(img: str) -> pygame.Surface:
     return scaled_img
 
 
+def load_and_scale_entity_images(entities_module: ModuleType) -> dict[type, list[pygame.Surface]]:
+    """
+    Load and scale images for each entity class defined in the entities' module.
+
+    Args:
+        entities_module (ModuleType): The module containing entity classes.
+
+    Returns:
+        dict[type, list[pygame.Surface]]: A dictionary mapping entity classes to their scaled images.
+    """
+    scaled_images: dict[type, list[pygame.Surface]] = {}
+    for entity_name in all_entities:
+        entity_class: type = getattr(entities_module, entity_name)  # Get Class from modules
+
+        # Create an instance of the entity's Class for access to the image attrib
+        entity_instance = entity_class(None, 0, 0)
+
+        image_paths: list = entity_instance.attributes["images"]
+        if image_paths:
+            images = []
+            for image_path in image_paths:
+                try:
+                    image_size = entity_instance.image_size
+                    images.append(pygame.transform.scale(pygame.image.load(image_path), image_size))
+                except AttributeError:
+                    images.append(pygame.transform.scale(pygame.image.load(image_path), (GRID_SIZE, GRID_SIZE)))
+            scaled_images[entity_class] = images
+
+    return scaled_images
+
+
 class GameplayScreen(BaseScreen):
     """
     The GameplayScreen renders the game itself
@@ -70,7 +101,7 @@ class GameplayScreen(BaseScreen):
 
         # Load all images
         self.background_img = scale_background('background.jpg')
-        self.entity_imgs = self.load_and_scale_entity_images(sys.modules['entities'])
+        self.entity_imgs = load_and_scale_entity_images(sys.modules['entities'])
 
         # When all assets are loaded, start the game
         self.game_manager.set_game_status(True)
@@ -78,36 +109,6 @@ class GameplayScreen(BaseScreen):
         pygame.mixer.music.load('./assets/music/gameplay.mp3')
         pygame.mixer.music.play()
         pygame.mixer.music.set_volume(0.05)
-
-    def load_and_scale_entity_images(self, entities_module: ModuleType) -> dict[type, list[pygame.Surface]]:
-        """
-        Load and scale images for each entity class defined in the entities' module.
-
-        Args:
-            entities_module (ModuleType): The module containing entity classes.
-
-        Returns:
-            dict[type, list[pygame.Surface]]: A dictionary mapping entity classes to their scaled images.
-        """
-        scaled_images: dict[type, list[pygame.Surface]] = {}
-        for entity_name in all_entities:
-            entity_class: type = getattr(entities_module, entity_name)  # Get Class from modules
-
-            # Create an instance of the entity's Class for access to the image attrib
-            entity_instance = entity_class(None, 0, 0)
-
-            image_paths: list = entity_instance.attributes["images"]
-            if image_paths:
-                images = []
-                for image_path in image_paths:
-                    try:
-                        image_size = entity_instance.image_size
-                        images.append(pygame.transform.scale(pygame.image.load(image_path), image_size))
-                    except AttributeError:
-                        images.append(pygame.transform.scale(pygame.image.load(image_path), (GRID_SIZE, GRID_SIZE)))
-                scaled_images[entity_class] = images
-
-        return scaled_images
 
     def begin_wave(self) -> None:
         """
@@ -131,6 +132,16 @@ class GameplayScreen(BaseScreen):
         if wave >= 5:
             weight_speedy = min((wave - 4) * 0.1, 1.0)  # Weight SpeedyZombies into the mix
             zombie_roles.extend([SpeedyZombie] * int(num_zombies * weight_speedy))
+
+        # For Wave 10+, start adding Hulking Zombies
+        if wave >= 10:
+            weight_hulking = min((wave - 9) * 0.1, 1.0)  # Weight HulkingZombies into the mix
+            zombie_roles.extend([HulkingZombie] * int(num_zombies * weight_hulking))
+
+        # For Wave 15+, start adding Polymorph Zombies
+        if wave >= 15:
+            weight_poly = min((wave - 14) * 0.1, 1.0)  # Weight PolymorphZombies into the mix
+            zombie_roles.extend([PolymorphZombie] * int(num_zombies * weight_poly))
 
         # For any room left in the list, fill with regular Zombies
         remaining_zombies = num_zombies - len(zombie_roles)
@@ -229,6 +240,11 @@ class GameplayScreen(BaseScreen):
             self.begin_wave()
             self.game_manager.update_wave()
 
+        # Auto sets the Collision false to fix the collision issue when
+        # Attacking plants
+        for zombie in self.zombies:
+            zombie.collided_with_plant = False
+
         for plant in self.plants:
             for zombie in self.zombies:
                 if zombie.y == plant.y:
@@ -250,7 +266,7 @@ class GameplayScreen(BaseScreen):
 
         # Check if any zombie go outside the screen
         if any(zombie.x <= -GRID_SIZE for zombie in self.zombies):
-            wave = self.game_manager.get_wave()-1
+            wave = self.game_manager.get_wave() - 1
             self.game_manager.set_game_status(False)
 
             # Add a fade-to-black effect when the game is over
