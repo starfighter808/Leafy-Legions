@@ -2,7 +2,7 @@
 Leafy Legions: DatabaseManager
 
 This module contains the DatabaseManager class
-for managing the communication to Supabase
+for managing the communication to Firebase
 """
 # Library Imports
 import bcrypt
