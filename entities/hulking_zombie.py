@@ -33,9 +33,10 @@ class HulkingZombie(Zombie):
         self.image_size = (125, 125)
         self.speed: float = 1.75
         self.health: int = 500
+        self.damage: int = 150
 
         self.attributes = {
-            "name": "Hulking Zombie",
+            "name": "The Behemoth",
             "images": ["assets/images/hulk_zombie.png"],
-            "description": "???"
+            "description": "A towering zombie with immense strength and resilience, it crushes plants in its path."
         }

@@ -28,7 +28,8 @@ if TYPE_CHECKING:
 # CONSTANTS
 GRID_WIDTH: int = 9
 GRID_HEIGHT: int = 5
-GRID_SIZE: int = 114
+GRID_SIZE: int = 125
+GRID_OFFSET: int = 100
 PLANT_COST: int = 15
 
 
@@ -105,10 +106,7 @@ class GameplayScreen(BaseScreen):
 
         # When all assets are loaded, start the game
         self.game_manager.set_game_status(True)
-
-        pygame.mixer.music.load('./assets/music/gameplay.mp3')
-        pygame.mixer.music.play()
-        pygame.mixer.music.set_volume(0.05)
+        self.sound_manager.play_music('gameplay.mp3')
 
     def begin_wave(self) -> None:
         """
@@ -163,12 +161,13 @@ class GameplayScreen(BaseScreen):
             objs (List): A list of entities to be drawn.
         """
         # Draw background
-        self.display.blit(self.background_img, (0, 100))
+        self.display.blit(self.background_img, (0, GRID_OFFSET))
 
         # Draw grid
         for x in range(0, GRID_WIDTH * GRID_SIZE, GRID_SIZE):
-            pygame.draw.line(self.display, self.colors.BLACK, (x, 100), (x, GRID_HEIGHT * GRID_SIZE + 100))
-        for y in range(100, GRID_HEIGHT * GRID_SIZE + 100, GRID_SIZE):
+            pygame.draw.line(self.display, self.colors.BLACK, (x, GRID_OFFSET),
+                             (x, GRID_HEIGHT * GRID_SIZE + GRID_OFFSET))
+        for y in range(GRID_OFFSET, GRID_HEIGHT * GRID_SIZE + GRID_OFFSET, GRID_SIZE):
             pygame.draw.line(self.display, self.colors.BLACK, (0, y), (GRID_WIDTH * GRID_SIZE, y))
 
         # Sort entities by type: Plant, then Zombie, so that zombies always appear "on top"
@@ -179,7 +178,7 @@ class GameplayScreen(BaseScreen):
             if images:
                 try:
                     cell_center_x = obj.x + (GRID_SIZE - obj.image_size[0]) / 2
-                    cell_center_y = obj.y + 100 + (GRID_SIZE - obj.image_size[1]) / 2
+                    cell_center_y = obj.y + GRID_OFFSET + (GRID_SIZE - obj.image_size[1]) / 2
 
                     # Assign a random animation offset to each entity
                     if not hasattr(obj, 'animation_offset'):
@@ -189,7 +188,7 @@ class GameplayScreen(BaseScreen):
                     image_index = ((current_time + obj.animation_offset) // 500) % len(images)
                     self.display.blit(images[image_index], (cell_center_x, cell_center_y))
                 except (AttributeError, IndexError):
-                    self.display.blit(images[0], (obj.x, obj.y + 100))
+                    self.display.blit(images[0], (obj.x, obj.y + GRID_OFFSET))
 
     def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -198,10 +197,11 @@ class GameplayScreen(BaseScreen):
         Args:
             mouse_pos (Tuple[int, int]): The position of the mouse cursor.
         """
+        super().handle_click_events(mouse_pos)
         mouse_x: int = mouse_pos[0]
         mouse_y: int = mouse_pos[1]
         grid_x: int = mouse_x // GRID_SIZE
-        grid_y: int = (mouse_y - 100) // GRID_SIZE
+        grid_y: int = (mouse_y - GRID_OFFSET) // GRID_SIZE
 
         existing_plant: bool = any(plant.x == grid_x * GRID_SIZE
                                    and plant.y == grid_y * GRID_SIZE for plant in self.plants)
@@ -214,9 +214,9 @@ class GameplayScreen(BaseScreen):
                 self.game_manager.add(new_plant)
                 print(f"New Plant {new_plant.x, new_plant.y}. Health: {new_plant.health}")
             else:
-                self.game_manager.play_sound('error.mp3', 0.15)
+                self.sound_manager.play_sound('error.mp3', 0.15)
         else:
-            self.game_manager.play_sound('error.mp3', 0.15)
+            self.sound_manager.play_sound('error.mp3', 0.15)
 
     def render(self) -> None:
         """

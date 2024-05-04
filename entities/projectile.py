@@ -54,7 +54,7 @@ class Projectile(Entity):
             self.game_manager.remove(zombie)
             self.game_manager.add_coins(10)
 
-        self.game_manager.play_sound('hit.ogg')
+        self.sound_manager.play_sound('hit.ogg')
         self.game_manager.remove(self)
 
     def update_position(self) -> None:

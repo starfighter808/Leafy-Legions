@@ -126,6 +126,7 @@ class SignInSignUpScreen(BaseScreen):
         Args:
             mouse_pos (Tuple[int, int]): The position of the mouse cursor.
         """
+        super().handle_click_events(mouse_pos)
         if self.input_rect_username.collidepoint(mouse_pos):
             self.username_active = True
             self.password_active = False
@@ -165,6 +166,19 @@ class SignInSignUpScreen(BaseScreen):
             key_pressed (int): The key pressed on the keyboard in integer form
             unicode_char (str): The value that the key represents
         """
+        # Ignore ENTER key
+        if key_pressed == pygame.K_RETURN:
+            unicode_char = ""
+        # If tab key, cycle between both fields
+        if key_pressed == pygame.K_TAB:
+            unicode_char = ""
+            if self.username_active:
+                self.username_active = False
+                self.password_active = True
+            else:
+                self.username_active = True
+                self.password_active = False
+
         if self.username_active:
             if key_pressed == pygame.K_BACKSPACE:
                 self.username_text = self.username_text[:-1]

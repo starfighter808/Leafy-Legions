@@ -35,7 +35,7 @@ class PolymorphZombie(Zombie):
         self.health: int = 600
 
         self.attributes = {
-            "name": "Polymorph Zombie",
+            "name": "The Shapeshifter",
             "images": ["assets/images/polymorph_zombie.png"],
-            "description": "???"
+            "description": "A formidable zombie with increased health and speed, it adapts to its surroundings for survival."
         }

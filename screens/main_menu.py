@@ -55,12 +55,14 @@ class MainMenuScreen(BaseScreen):
 
         # Button position calculations
         button_x = (self.display.get_width() - button_width) // 2
-        total_height = (button_height * 4) + image_height + image_margin_bottom  # Total height including image and button spacing
+
+        # Total height including image and button spacing
+        total_height = (button_height * 4) + image_height + image_margin_bottom
         button_gap = (self.display.get_height() - total_height) // 5  # Gap between each button and the image
 
         # Calculate the y positions for each button
-        image_y = button_gap + 50  # Move image a bit down
-        sign_in_btn_y = image_y + image_height + image_margin_bottom + button_gap - 110  # Move buttons a bit up
+        self.image_y = button_gap + 50  # Move image a bit down
+        sign_in_btn_y = self.image_y + image_height + image_margin_bottom + button_gap - 110  # Move buttons a bit up
         leaderboard_btn_y = sign_in_btn_y + button_height + button_gap
         almanac_btn_y = leaderboard_btn_y + button_height + button_gap
         quit_btn_y = almanac_btn_y + button_height + button_gap
@@ -90,7 +92,7 @@ class MainMenuScreen(BaseScreen):
 
         # Add a logo to the top of the screen
         self.display_image(image_filename="rellisLogo.png",
-                           image_position=(self.display.get_width() // 2, image_y),
+                           image_position=(self.display.get_width() // 2, self.image_y),
                            image_size=(150, 169)
                            )
 
@@ -101,14 +103,15 @@ class MainMenuScreen(BaseScreen):
         Args:
             mouse_pos (Tuple[int, int]): The position of the mouse cursor.
         """
-        if self.sign_in_btn.collidepoint(mouse_pos):
+        super().handle_click_events(mouse_pos)
+        if self.sign_in_btn and self.sign_in_btn.collidepoint(mouse_pos):
             if self.screen_manager.user_logged_in:
                 self.screen_manager.set_screen("GameplayScreen")
             else:
                 self.screen_manager.set_screen("SignInSignUpScreen")
-        elif self.leaderboard_btn.collidepoint(mouse_pos):
+        elif self.leaderboard_btn and self.leaderboard_btn.collidepoint(mouse_pos):
             self.screen_manager.set_screen("LeaderboardScreen")
-        elif self.almanac_btn.collidepoint(mouse_pos):  # Handle click event for the almanac button
+        elif self.almanac_btn and self.almanac_btn.collidepoint(mouse_pos):  # Handle click event for the almanac button
             self.screen_manager.set_screen("AlmanacScreen")
-        elif self.quit_btn.collidepoint(mouse_pos):
+        elif self.quit_btn and self.quit_btn.collidepoint(mouse_pos):
             self.screen_manager.quit()

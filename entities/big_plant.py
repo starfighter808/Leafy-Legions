@@ -1,7 +1,7 @@
 """
-Leafy Legions: RosePlant (Plant/Entity)
+Leafy Legions: BigPlant (Plant/Entity)
 
-This module contains the RosePlant class,
+This module contains the BigPlant class,
 a type of Plant/Entity on the Gameplay board
 """
 # Standard Imports
@@ -16,25 +16,25 @@ if TYPE_CHECKING:
     from managers import GameManager
 
 
-class RosePlant(Plant):
+class BigPlant(Plant):
     """
-    A Rose Plant is a type of Plant with decreased health but faster attack speed.
+    A BigPlant is a type of Plant with increased health and cost.
     """
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
-        Initializes a Rose Plant object.
+        Initializes a BigPlant object, inheriting from the Plant class
 
         Args:
             game_manager (GameManager): An instance of the GameManager managing the plant.
-            x (int): The initial x-coordinate of the plant.
-            y (int): The initial y-coordinate of the plant.
+            x (int): The initial x-coordinate of the zombie.
+            y (int): The initial y-coordinate of the zombie.
         """
         super().__init__(game_manager, x, y)
-        self.health: int = 75  # Health of the plants
-        self.attack_speed: float = 2.0
+        self.health: int = 400
+        self.cost: int = 30
 
         self.attributes = {
-            "name": "The Thorny Guardian",
-            "images": ["assets/images/rose_plant.png"],
-            "description": "A delicate but deadly plant, its rapid-fire thorns keep zombies at bay."
+            "name": "The Green Giant",
+            "images": ["assets/images/big_plant.png"],
+            "description": "A towering plant with increased health, it stands as a formidable barrier against zombies."
         }

@@ -39,14 +39,12 @@ class Plant(Entity):
         self.attack_speed: float = 1.0
         self.__last_attack: int = 0
         if game_manager:
-            self.game_manager.play_sound('plant.ogg')
+            self.sound_manager.play_sound('plant.ogg')
 
         self.attributes = {
             "name": "The Cowboy",
             "images": ["assets/images/plant.png"],
-            "description": "A sharpshooting sentinel with a ten-gallon hat and a lasso, it wrangles foes while "
-                           "providing cover. Agile and precise, it turns the tide with its quick reflexes and summons"
-                           "allies to stampede to victory!"
+            "description": "A sharpshooting sentinel, it wrangles foes with quick reflexes and summons allies."
         }
 
     def __can_attack(self) -> bool:
@@ -65,7 +63,7 @@ class Plant(Entity):
         """
         if self.__can_attack():
             self.__last_attack = pygame.time.get_ticks()
-            self.game_manager.play_sound('shoot.ogg')
+            self.sound_manager.play_sound('shoot.ogg')
 
             new_projectile = Projectile(self.game_manager, self.x + 75, self.y)
             self.game_manager.add(new_projectile)

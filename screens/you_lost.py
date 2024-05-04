@@ -85,7 +85,8 @@ class YouLostScreen(BaseScreen):
         Args:
             mouse_pos (Tuple[int, int]): The position of the mouse cursor.
         """
-        if self.play_again_btn.collidepoint(mouse_pos):
+        super().handle_click_events(mouse_pos)
+        if self.play_again_btn and self.play_again_btn.collidepoint(mouse_pos):
             self.screen_manager.set_screen("GameplayScreen")
-        elif self.return_btn.collidepoint(mouse_pos):
+        elif self.return_btn and self.return_btn.collidepoint(mouse_pos):
             self.screen_manager.set_screen("MainMenuScreen")

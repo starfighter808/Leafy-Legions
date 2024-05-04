@@ -14,25 +14,25 @@ import sys
 import pygame
 
 # Local Imports
-from managers import ScreenManager
+from managers import ScreenManager, SoundManager
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the game window, scaled if needed
 os.environ['SDL_VIDEO_CENTERED'] = '1'
-display: pygame.Surface = pygame.display.set_mode((1024, 768), pygame.SCALED)
+
+# Using common aspect ratio (1124x768)
+display: pygame.Surface = pygame.display.set_mode((1120, 720), pygame.SCALED)
 pygame.display.set_caption("Leafy Legions")
 
 # Create an instance of ScreenManager
 screen_manager = ScreenManager(display)
+sound_manager = SoundManager
 
 # Set the default screen to the Main Menu
 screen_manager.set_screen("MainMenuScreen")
-
-pygame.mixer.music.load('./assets/music/main_menu.mp3')
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.05)
+sound_manager.play_music('main_menu.mp3')
 
 # Main game loop
 while screen_manager.is_running():
@@ -42,11 +42,11 @@ while screen_manager.is_running():
 
         # If QUIT Event:
         if event.type == pygame.QUIT:
-            # Quit current screen, ending the progrma
+            # Quit current screen, ending the program
             screen_manager.quit()
 
         # If CLICK Event:
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             # Send mouse clicks to the current screen to get handled
             if screen_manager.current_screen:
                 mouse_pos: tuple[int, int] = pygame.mouse.get_pos()

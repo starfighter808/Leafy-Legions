@@ -5,13 +5,14 @@ This module contains the BaseScreen class
 for managing functions used in any Screen in the game
 """
 # Standard Imports
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 # Library Imports
 import pygame
 
 # Local Imports
-from managers import ColorManager
+from managers import ColorManager, SoundManager
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
     from managers import ScreenManager
 
 
-class BaseScreen:
+class BaseScreen(ABC):
     """
     A base class for all screens in the game.
     """
@@ -38,47 +39,12 @@ class BaseScreen:
         self.screen_manager = screen_manager
         self.display = display
         self.colors = ColorManager
+        self.sound_manager = SoundManager
+        self.button_hover_states = {}  # Dictionary to store hover states of buttons
         self.database_manager = self.screen_manager.database_manager
         pygame.display.set_caption(title)
 
         self.return_btn = None
-
-    def render(self) -> None:
-        """
-        Render an error screen in the event that one is not properly implemented
-        """
-        self.display.fill(self.colors.BROWN)
-        self.display_message(message="404 - Not Found",
-                             font_color=self.colors.GREEN,
-                             text_position=(self.display.get_width() // 2, 100),
-                             font_size=64
-                             )
-
-        self.display_message(message="This page has not yet been implemented",
-                             font_color=self.colors.WHITE,
-                             text_position=(self.display.get_width() // 2, 200)
-                             )
-
-        btn_width, btn_height = 300, 70
-        btn_x = (self.display.get_width() - btn_width) // 2
-        btn_y = (self.display.get_height() - 300) + 100
-
-        # Render "Return to Main Menu" button aligned to the center
-        self.return_btn = self.display_button(message="Return to Main Menu",
-                                              button_position=(btn_x, btn_y),
-                                              button_size=(btn_width, btn_height)
-                                              )
-        self.screen_manager.user_logged_in = True
-
-    def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
-        """
-        Handle events on the leaderboard screen.
-
-        Args:
-            mouse_pos (Tuple[int, int]): The position of the mouse cursor.
-        """
-        if self.return_btn.collidepoint(mouse_pos):
-            self.screen_manager.set_screen("MainMenuScreen")
 
     def display_message(self,
                         message: str,
@@ -177,22 +143,33 @@ class BaseScreen:
 
         font = pygame.font.Font(None, 36)
         button_text: pygame.Surface = font.render(message, True, self.colors.WHITE)
-        button_text.set_alpha(alpha)  # Set the alpha value for transparency
+        button_text.set_alpha(alpha)
         button_rect = button_text.get_rect(topleft=button_position)
 
         # Adjust button size
         button_rect.width, button_rect.height = button_size
+
+        button_pos_tuple = (button_rect.x, button_rect.y)
 
         # Draw the regular buttons
         border_color = tuple(max(0, c - 15) for c in button_color)
         pygame.draw.rect(self.display, button_color, button_rect, border_radius=5)
         pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
 
-        # If the mouse is over the buttons, redraw with hover colors
+        # If there is a hover color and the mouse is over the button, draw the hover color
         if hover_color and button_rect.collidepoint(pygame.mouse.get_pos()):
-            border_color = tuple(max(0, c - 15) for c in hover_color)
-            pygame.draw.rect(self.display, hover_color, button_rect, border_radius=5)
-            pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
+            # Ensure button is not disabled:
+            if hover_color is not button_color:
+                border_color = tuple(max(0, c - 60) for c in hover_color)
+                pygame.draw.rect(self.display, hover_color, button_rect, border_radius=5)
+                pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
+
+                # Play sound if not already played
+                if not self.button_hover_states.get(button_pos_tuple, False):
+                    self.button_hover_states[button_pos_tuple] = True
+                    self.sound_manager.play_sound('button_hover.mp3')
+        else:
+            self.button_hover_states[button_pos_tuple] = False
 
         # Center text within the button
         text_rect = button_text.get_rect(center=button_rect.center)
@@ -222,6 +199,15 @@ class BaseScreen:
         image_rect = image.get_rect(center=image_position)
         self.display.blit(image, image_rect)
 
+    @abstractmethod
+    def render(self) -> None:
+        """
+        Render the application
+        """
+        # This function is intentionally left blank and should be overridden in derived classes.
+        # It is marked as abstractmethod to require implementation in each derived Screen.
+        return
+
     def handle_key_events(self, key_pressed: int, unicode_char: str) -> None:
         """
         Render when a key is pressed on the keyboard in the
@@ -231,4 +217,15 @@ class BaseScreen:
             key_pressed (int): The key pressed on the keyboard in integer form
             unicode_char (str): The value that the key represents
         """
+        # This function is intentionally left blank and should be overridden in derived classes.
+        return
 
+    def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
+        """
+        Handle events on the leaderboard screen.
+
+        Args:
+            mouse_pos (Tuple[int, int]): The position of the mouse cursor.
+        """
+        # After each click, reset the button states to play the sound again
+        self.button_hover_states = {}

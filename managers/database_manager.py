@@ -101,13 +101,13 @@ class DatabaseManager:
             return False
 
         # Find the password of the supplied username
-        stored_hash = str(self.database.child('users').child(username).child('password').get())
+        stored_hash = self.database.child('users').child(username).child('password').get()
 
         if not stored_hash:
             return False
 
         # Use bcrypt to compare hashes (true means working):
-        return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
+        return bcrypt.checkpw(password.encode('utf-8'), str(stored_hash).encode('utf-8'))
 
     def update_high_score(self, username: str, new_high_score: int) -> None:
         """

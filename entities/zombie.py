@@ -39,6 +39,7 @@ class Zombie(Entity):
         self.health: int = 200
         self.speed: float = 2.0
         self.attack_speed: float = 1.0
+        self.damage: int = 25
         self.collided_with_plant: bool = False  # Flag to indicate collision with a plant
 
         self.__last_attack: int = 0
@@ -69,7 +70,7 @@ class Zombie(Entity):
         if self.__can_attack():
             self.__last_attack = pygame.time.get_ticks()
 
-            plant.health -= 25
+            plant.health -= self.damage
             print(f"Zombie attacking Plant ({plant.x}, {plant.y}). Health: {plant.health}")
 
             if plant.health <= 0:

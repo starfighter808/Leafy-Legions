@@ -68,7 +68,7 @@ class AlmanacScreen(BaseScreen):
 
         self.display_message(message="Almanac",
                              font_color=self.colors.GREEN,
-                             text_position=(self.display.get_width() // 2, 50),
+                             text_position=(self.display.get_width() // 2, 70),
                              font_size=64
                              )
 
@@ -80,27 +80,28 @@ class AlmanacScreen(BaseScreen):
         display_data = list(self.almanac_data.values())[start_index:end_index]
 
         # # Display almanac data
-        x, y = 360, 330
+        x, y = self.display.get_width() // 2, 340
+        text_and_buttons_x = x - (x * 0.32)
         for attributes in display_data:
             # Add the almanac background
             self.display_image(image_filename="almanac.png",
-                               image_position=(self.display.get_width() // 2, y),
+                               image_position=(x, y),
                                image_size=(396, 474)
                                )
 
             self.display_message(message=attributes["name"],
                                  font_color=self.colors.WHITE,
-                                 text_position=(self.display.get_width() // 2, y - 220)
+                                 text_position=(x, y - 220)
                                  )
 
             self.display_image(image_filename=attributes["images"],
-                               image_position=(self.display.get_width() // 2, y - 85),
+                               image_position=(x, y - 85),
                                image_size=(140, 140)
                                )
 
             self.display_message(message=attributes["description"],
-                                 font_color=self.colors.WHITE,
-                                 text_position=(self.display.get_width() // 4 + 75, y + 40),
+                                 font_color=self.colors.LIGHT_BROWN,
+                                 text_position=(text_and_buttons_x, y + 40),
                                  text_align="topleft",
                                  allowed_width=370,
                                  font_size=32
@@ -108,44 +109,44 @@ class AlmanacScreen(BaseScreen):
 
         # Calculate button position based on a fixed vertical offset from the bottom
         button_width, button_height = 150, 50
-        padding = 30  # Padding between buttons and text
-        bottom_offset = 190  # Offset from the bottom of the screen
-        left_button_x = x - padding
-        right_button_x = x + button_width + padding
+        bottom_offset = 180  # Offset from the bottom of the screen
+        right_button_x = text_and_buttons_x + button_width + 55
         button_y = self.display.get_height() - bottom_offset
 
-        # Render "Previous" button aligned to the left
-        self.previous_btn = self.display_button(message="Previous",
-                                                button_position=(left_button_x, button_y),
-                                                button_size=(button_width, button_height)
-                                                )
-        # Render "Next" button aligned to the right
-        self.next_btn = self.display_button(message="Next",
-                                            button_position=(right_button_x, button_y),
-                                            button_size=(button_width, button_height)
-                                            )
-
-        # Disable previous button if already on the first page
         if self.current_page == 1:
+            # If there are no more pages, disable button
             self.previous_btn = self.display_button(message="Previous",
-                                                    button_position=(left_button_x, button_y),
+                                                    button_position=(text_and_buttons_x, button_y),
                                                     button_size=(button_width, button_height),
                                                     button_color=self.colors.GRAY,
                                                     hover_color=self.colors.GRAY
                                                     )
-        # Disable next button if no more pages left
+        else:
+            # Otherwise, display the button with normal colors
+            self.previous_btn = self.display_button(message="Previous",
+                                                    button_position=(text_and_buttons_x, button_y),
+                                                    button_size=(button_width, button_height)
+                                                    )
+
         if end_index >= len(self.almanac_data):
+            # If there are no more pages, disable button
             self.next_btn = self.display_button(message="Next",
                                                 button_position=(right_button_x, button_y),
                                                 button_size=(button_width, button_height),
                                                 button_color=self.colors.GRAY,
                                                 hover_color=self.colors.GRAY
                                                 )
+        else:
+            # Otherwise, display the button with normal colors
+            self.next_btn = self.display_button(message="Next",
+                                                button_position=(right_button_x, button_y),
+                                                button_size=(button_width, button_height)
+                                                )
 
         # Calculate the center position for the "Return to Main Menu" button
         return_button_width, return_button_height = 300, 70
         return_button_x = (self.display.get_width() - return_button_width) // 2
-        return_button_y = button_y + 100  # Offset from the "Next" button
+        return_button_y = button_y + 80  # Offset from the "Next" button
 
         # Render "Return to Main Menu" button aligned to the center
         self.return_btn = self.display_button(message="Return to Main Menu",
@@ -160,9 +161,10 @@ class AlmanacScreen(BaseScreen):
         Args:
             mouse_pos (Tuple[int, int]): The position of the mouse cursor.
         """
-        if self.return_btn.collidepoint(mouse_pos):
+        super().handle_click_events(mouse_pos)
+        if self.return_btn and self.return_btn.collidepoint(mouse_pos):
             self.screen_manager.set_screen("MainMenuScreen")
-        if self.previous_btn.collidepoint(mouse_pos) and self.current_page > 1:
+        if self.previous_btn and self.previous_btn.collidepoint(mouse_pos) and self.current_page > 1:
             self.current_page -= 1
-        elif self.next_btn.collidepoint(mouse_pos) and self.current_page < len(self.almanac_data):
+        elif self.next_btn and self.next_btn.collidepoint(mouse_pos) and self.current_page < len(self.almanac_data):
             self.current_page += 1

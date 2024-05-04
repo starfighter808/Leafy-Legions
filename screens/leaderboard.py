@@ -61,51 +61,53 @@ class LeaderboardScreen(BaseScreen):
         display_data = self.leaderboard_data[start_index:end_index]
 
         # Display leaderboard data
-        x, y = 360, 160
+        x, y = self.display.get_width() // 2, 150
+        text_and_buttons_x = x - (x * 0.32)
         for idx, entry in enumerate(display_data, start=start_index + 1):
             username = entry["username"]
             waves = entry["high_score"]
             line = f"{idx}. {username}: Waves {waves}"
             self.display_message(message=line,
                                  font_color=self.colors.WHITE,
-                                 text_position=(x, y)
+                                 text_position=(text_and_buttons_x, y),
+                                 text_align="topleft"
                                  )
             y += 50  # Adjust vertical spacing for the next line
 
         # Calculate button position based on a fixed vertical offset from the bottom
         button_width, button_height = 150, 50
-        padding = 30  # Padding between buttons and text
         bottom_offset = 300  # Offset from the bottom of the screen
-        left_button_x = x - padding
-        right_button_x = x + button_width + padding
+        right_button_x = text_and_buttons_x + button_width + 55
         button_y = self.display.get_height() - bottom_offset
 
-        # Render "Previous" button aligned to the left
-        self.previous_btn = self.display_button(message="Previous",
-                                                button_position=(left_button_x, button_y),
-                                                button_size=(button_width, button_height)
-                                                )
-        # Render "Next" button aligned to the right
-        self.next_btn = self.display_button(message="Next",
-                                            button_position=(right_button_x, button_y),
-                                            button_size=(button_width, button_height)
-                                            )
-
-        # Disable previous button if already on the first page
         if self.current_page == 1:
+            # If there are no more pages, disable button
             self.previous_btn = self.display_button(message="Previous",
-                                                    button_position=(left_button_x, button_y),
+                                                    button_position=(text_and_buttons_x, button_y),
                                                     button_size=(button_width, button_height),
                                                     button_color=self.colors.GRAY,
                                                     hover_color=self.colors.GRAY
                                                     )
-        # Disable next button if no more pages left
+        else:
+            # Otherwise, display the button with normal colors
+            self.previous_btn = self.display_button(message="Previous",
+                                                    button_position=(text_and_buttons_x, button_y),
+                                                    button_size=(button_width, button_height)
+                                                    )
+
         if end_index >= len(self.leaderboard_data):
+            # If there are no more pages, disable button
             self.next_btn = self.display_button(message="Next",
                                                 button_position=(right_button_x, button_y),
                                                 button_size=(button_width, button_height),
                                                 button_color=self.colors.GRAY,
                                                 hover_color=self.colors.GRAY
+                                                )
+        else:
+            # Otherwise, display the button with normal colors
+            self.next_btn = self.display_button(message="Next",
+                                                button_position=(right_button_x, button_y),
+                                                button_size=(button_width, button_height)
                                                 )
 
         # Calculate the center position for the "Return to Main Menu" button
@@ -126,10 +128,11 @@ class LeaderboardScreen(BaseScreen):
         Args:
             mouse_pos (Tuple[int, int]): The position of the mouse cursor.
         """
-        if self.return_btn.collidepoint(mouse_pos):
+        super().handle_click_events(mouse_pos)
+        if self.return_btn and self.return_btn.collidepoint(mouse_pos):
             self.screen_manager.set_screen("MainMenuScreen")
-        if self.previous_btn.collidepoint(mouse_pos) and self.current_page > 1:
+        if self.previous_btn and self.previous_btn.collidepoint(mouse_pos) and self.current_page > 1:
             self.current_page -= 1
-        elif (self.next_btn.collidepoint(mouse_pos) and
+        elif self.next_btn and (self.next_btn.collidepoint(mouse_pos) and
               (self.current_page * self.entries_per_page) < len(self.leaderboard_data)):
             self.current_page += 1

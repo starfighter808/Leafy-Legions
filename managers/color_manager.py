@@ -13,6 +13,7 @@ class ColorManager:
     WHITE: tuple[int, int, int] = (255, 255, 255)
     LIGHT_BLUE: tuple[int, int, int] = (52, 152, 219)
     GRAY: tuple[int, int, int] = (128, 128, 128)
+    LIGHT_BROWN: tuple[int, int, int] = (139, 69, 19)
     BROWN: tuple[int, int, int] = (100, 75, 55)
     GREEN: tuple[int, int, int] = (46, 204, 113)
     BLACK: tuple[int, int, int] = (0, 0, 0)

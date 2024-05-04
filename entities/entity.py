@@ -7,6 +7,9 @@ for managing every Entity in the Gameplay board
 # Standard Imports
 from typing import TYPE_CHECKING
 
+# Local Imports
+from managers import SoundManager
+
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
@@ -29,6 +32,7 @@ class Entity:
         self.game_manager = game_manager
         self.x = x
         self.y = y
+        self.sound_manager = SoundManager
 
         self.attributes = {
             "images": []

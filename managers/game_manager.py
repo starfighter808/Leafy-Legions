@@ -5,14 +5,9 @@ This module contains the GameManager class
 for managing everything happening after the
 user presses on the "Start" button
 """
-# Standard Imports
-import os
-
-# Library Imports
-import pygame
-
 # Local Imports
 from entities import Plant, Zombie, Projectile
+from managers import SoundManager
 
 Entity = Zombie | Plant | Projectile
 
@@ -32,8 +27,9 @@ class GameManager:
             Projectile: [],  # List to store instances of the Projectile class
         }
         self.__game_running: bool = False
-        self.__coins: int = 25
-        self.__wave: int = 1
+        self.sound_manager = SoundManager
+        self.__coins: int = 25  # Default: 25 coins
+        self.__wave: int = 1    # Default: 1 wave
 
     def __validate_entity(self, entity: Entity) -> type[Entity]:
         """
@@ -126,28 +122,8 @@ class GameManager:
             game_running (bool): The status of the game.
         """
         self.__game_running = game_running
-        if not game_running:
+        if not self.__game_running:
             self.reset()
-
-    def play_sound(self, effect_file: str, volume: float = 0.05) -> None:
-        """
-        Play sound effect
-
-        Args:
-            effect_file (str): Name of the sound effect file
-            volume (float): Volume of the sound effect (default = 0.05)
-
-        Raises:
-            FileNotFoundError: If no sound is found
-        """
-        sound_path = f"./assets/sounds/{effect_file}"
-        if self.__game_running:
-            if os.path.exists(sound_path):
-                sound = pygame.mixer.Sound(sound_path)
-                sound.set_volume(volume)
-                sound.play()
-            else:
-                raise FileNotFoundError(f"No sound effect at {sound_path}")
 
     def get_coins(self) -> int:
         """
@@ -163,14 +139,13 @@ class GameManager:
         Add users' coins
         """
         self.__coins += coins
-        self.play_sound('moneyfalls.ogg')
+        self.sound_manager.play_sound('moneyfalls.ogg')
 
     def remove_coins(self, coins: int) -> None:
         """
         Remove users' coins
         """
         self.__coins -= coins
-        self.play_sound('moneyfalls.ogg')
 
     def get_wave(self) -> int:
         """
