@@ -8,12 +8,12 @@ a type of Plant/Entity on the Gameplay board
 from typing import TYPE_CHECKING
 
 # Local Imports
-from entities import Plant
+from src.entities import Plant
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameManager
+    from src.managers import GameManager
 
 
 class BigPlant(Plant):
@@ -36,7 +36,7 @@ class BigPlant(Plant):
 
         self.attributes = {
             "name": "Giant",
-            "images": ["assets/images/big_plant.png"],
+            "images": ["big_plant.png"],
             "description": "A towering plant with increased health and damage, it stands as a formidable barrier "
                            "against zombies."
         }

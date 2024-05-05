@@ -11,13 +11,13 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from managers import ColorManager
-from screens import BaseScreen
+from src.managers import ColorManager
+from src.screens import BaseScreen
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import ScreenManager
+    from src.managers import ScreenManager
 
 
 class SignInSignUpScreen(BaseScreen):

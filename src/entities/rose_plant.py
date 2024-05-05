@@ -8,12 +8,12 @@ a type of Plant/Entity on the Gameplay board
 from typing import TYPE_CHECKING
 
 # Local Imports
-from entities import Plant
+from src.entities import Plant
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameManager
+    from src.managers import GameManager
 
 
 class RosePlant(Plant):
@@ -36,6 +36,6 @@ class RosePlant(Plant):
 
         self.attributes = {
             "name": "Rose",
-            "images": ["assets/images/rose_plant.png"],
+            "images": ["rose_plant.png"],
             "description": "A delicate but deadly plant, its rapid-fire thorns keep zombies at bay."
         }

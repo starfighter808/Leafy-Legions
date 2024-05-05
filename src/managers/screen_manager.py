@@ -11,8 +11,8 @@ import inspect
 import pygame
 
 # Local Imports
-from managers import DatabaseManager
-import screens
+from src.managers import DatabaseManager
+from src import screens
 
 
 def _get_valid_screens() -> list[str]:

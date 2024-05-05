@@ -11,13 +11,12 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from entities import Entity
+from src.entities import Entity
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameManager
-    from entities import Plant
+    from src.managers import GameManager
 
 
 class Zombie(Entity):
@@ -45,7 +44,7 @@ class Zombie(Entity):
         self.__last_attack: int = 0
         self.attributes = {
             "name": "Stumbler",
-            "images": ["assets/images/zombie_1.png", "assets/images/zombie_2.png"],
+            "images": ["zombie_1.png", "zombie_2.png"],
             "description": "Slow but relentless, it overwhelms defenses with sheer numbers."
         }
 

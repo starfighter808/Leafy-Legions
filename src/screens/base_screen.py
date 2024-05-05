@@ -6,18 +6,20 @@ for managing functions used in any Screen in the game
 """
 # Standard Imports
 from abc import ABC, abstractmethod
+import os
+import sys
 from typing import TYPE_CHECKING
 
 # Library Imports
 import pygame
 
 # Local Imports
-from managers import ColorManager, SoundManager
+from src.managers import ColorManager, SoundManager
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import ScreenManager
+    from src.managers import ScreenManager
 
 
 class BaseScreen(ABC):
@@ -190,14 +192,16 @@ class BaseScreen(ABC):
         Display an image on the current screen.
 
         Args:
-            image_filename (str): The filename of the image located in "/assets/images/" directory.
+            image_filename (str): The filename of the image located in "/src/assets/images/" directory.
             image_position (tuple[float, float]): The position of the image (x, y).
             image_size (tuple[int, int]): The size of the image (width, height).
         """
-        if image_filename.startswith('assets'):
-            image = pygame.image.load(image_filename)
+        if getattr(sys, 'frozen', False):
+            base_path = os.path.join(sys._MEIPASS, f"src/assets/images/{image_filename}")
         else:
-            image = pygame.image.load(f"./assets/images/{image_filename}")
+            base_path = f"src/assets/images/{image_filename}"
+
+        image = pygame.image.load(base_path)
         if image_size:
             image = pygame.transform.scale(image, image_size)
         image_rect = image.get_rect(center=image_position)
@@ -214,7 +218,7 @@ class BaseScreen(ABC):
         Display an image as a button on the current screen.
 
         Args:
-            image_filename (str): The filename of the image located in "/assets/images/" directory.
+            image_filename (str): The filename of the image located in "/src/assets/images/" directory.
             image_position (tuple[float, float]): The position of the image (x, y).
             image_size (tuple[int, int]): The size of the image (width, height).
             background_color (tuple[int, int, int]): Optional - The color of the button background.
@@ -240,7 +244,12 @@ class BaseScreen(ABC):
                                image_size[0] // 2)
 
         # Load, convert and scale the image
-        image = pygame.image.load(f"./assets/images/{image_filename}").convert_alpha()
+        if getattr(sys, 'frozen', False):
+            base_path = os.path.join(sys._MEIPASS, f"src/assets/images/{image_filename}")
+        else:
+            base_path = f"src/assets/images/{image_filename}"
+
+        image = pygame.image.load(base_path).convert_alpha()
         image = pygame.transform.scale(image, image_size)
 
         # Blit the image onto the center of the background

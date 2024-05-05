@@ -8,6 +8,7 @@ for managing the game itself when running
 import inspect
 import math
 import random
+import os
 import sys
 from types import ModuleType
 from typing import TYPE_CHECKING
@@ -15,17 +16,17 @@ from typing import TYPE_CHECKING
 # Library Imports
 import pygame
 
-import entities
 # Local Imports
-from entities import Plant, Projectile, SpeedyZombie, Zombie, PolymorphZombie, HulkingZombie
-from entities import __all__ as all_entities
-from managers import ColorManager, GameManager
-from screens import BaseScreen
+from src import entities
+from src.entities import Plant, Projectile, SpeedyZombie, Zombie, PolymorphZombie, HulkingZombie
+from src.entities import __all__ as all_entities
+from src.managers import ColorManager, GameManager
+from src.screens import BaseScreen
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import ScreenManager
+    from src.managers import ScreenManager
 
 # CONSTANTS
 GRID_WIDTH: int = 9
@@ -40,12 +41,16 @@ def scale_background(img: str) -> pygame.Surface:
     Scales the image provided to fit the application
 
     Args:
-        img (str): The name of the image file in "/assets/images/"
+        img (str): The name of the image file in "/src/assets/images/"
 
     Returns:
          pygame.Surface: The scaled image as a pygame Surface
     """
-    scaled_img: pygame.Surface = pygame.image.load(f"./assets/images/{img}")
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.join(sys._MEIPASS, f"src/assets/images/{img}")
+    else:
+        base_path = f"src/assets/images/{img}"
+    scaled_img: pygame.Surface = pygame.image.load(base_path)
     scaled_img = pygame.transform.scale(scaled_img, (GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE))
     return scaled_img
 
@@ -71,11 +76,15 @@ def load_and_scale_entity_images(entities_module: ModuleType) -> dict[type, list
         if image_paths:
             images = []
             for image_path in image_paths:
+                if getattr(sys, 'frozen', False):
+                    base_path = os.path.join(sys._MEIPASS, f"src/assets/images/{image_path}")
+                else:
+                    base_path = f"src/assets/images/{image_path}"
                 try:
                     image_size = entity_instance.image_size
-                    images.append(pygame.transform.scale(pygame.image.load(image_path), image_size))
+                    images.append(pygame.transform.scale(pygame.image.load(base_path), image_size))
                 except AttributeError:
-                    images.append(pygame.transform.scale(pygame.image.load(image_path), (GRID_SIZE, GRID_SIZE)))
+                    images.append(pygame.transform.scale(pygame.image.load(base_path), (GRID_SIZE, GRID_SIZE)))
             scaled_images[entity_class] = images
 
     return scaled_images
@@ -104,7 +113,7 @@ class GameplayScreen(BaseScreen):
 
         # Load all images
         self.background_img = scale_background('background.jpg')
-        self.entity_imgs = load_and_scale_entity_images(sys.modules['entities'])
+        self.entity_imgs = load_and_scale_entity_images(sys.modules['src.entities'])
 
         # Create plant topbar
         self.plant_buttons = []
@@ -422,7 +431,11 @@ class GameplayScreen(BaseScreen):
 
         if self.held_item is not None:
             if self.held_item == 'shovel':
-                shovel_image = pygame.image.load('./assets/images/shovel_icon.png')
+                if getattr(sys, 'frozen', False):
+                    base_path = os.path.join(sys._MEIPASS, "src/assets/images/shovel_icon.png")
+                else:
+                    base_path = "src/assets/images/shovel_icon.png"
+                shovel_image = pygame.image.load(base_path)
                 shovel_image = pygame.transform.scale(shovel_image, (50, 50))
                 self.render_held_item(shovel_image)
             elif issubclass(self.held_item, Plant):

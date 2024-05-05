@@ -11,12 +11,12 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from entities import Entity, Projectile
+from src.entities import Entity, Projectile
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameManager
+    from src.managers import GameManager
 
 
 class Plant(Entity):
@@ -45,7 +45,7 @@ class Plant(Entity):
 
         self.attributes = {
             "name": "Cowboy",
-            "images": ["assets/images/plant.png"],
+            "images": ["plant.png"],
             "description": "A sharpshooting sentinel, it wrangles foes with quick reflexes and summons allies."
         }
 

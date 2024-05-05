@@ -6,8 +6,8 @@ for managing everything happening after the
 user presses on the "Start" button
 """
 # Local Imports
-from entities import Plant, Zombie, Projectile
-from managers import SoundManager
+from src.entities import Plant, Zombie, Projectile
+from src.managers import SoundManager
 
 Entity = Zombie | Plant | Projectile
 

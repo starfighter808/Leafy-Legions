@@ -6,6 +6,7 @@ for playing sounds and music in the application in the application
 """
 # System Imports
 import os
+import sys
 
 # Library Imports
 import pygame
@@ -28,7 +29,11 @@ class SoundManager:
         Raises:
             FileNotFoundError: If no music is found
         """
-        music_path = f"./assets/music/{music_file}"
+        if getattr(sys, 'frozen', False):
+            music_path = os.path.join(sys._MEIPASS, f"src/assets/music/{music_file}")
+        else:
+            music_path = f"src/assets/music/{music_file}"
+
         if os.path.exists(music_path):
             pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
@@ -48,7 +53,10 @@ class SoundManager:
         Raises:
             FileNotFoundError: If no sound is found
         """
-        sound_path = f"./assets/sounds/{effect_file}"
+        if getattr(sys, 'frozen', False):
+            sound_path = os.path.join(sys._MEIPASS, f"src/assets/sounds/{effect_file}")
+        else:
+            sound_path = f"src/assets/sounds/{effect_file}"
         if os.path.exists(sound_path):
             sound = pygame.mixer.Sound(sound_path)
             sound.set_volume(volume)

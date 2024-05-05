@@ -4,6 +4,10 @@ Leafy Legions: DatabaseManager
 This module contains the DatabaseManager class
 for managing the communication to Firebase
 """
+# Standard Imports
+import os
+import sys
+
 # Library Imports
 import bcrypt
 import firebase_admin
@@ -19,7 +23,12 @@ class DatabaseManager:
         """
         Initialize the DatabaseManager using Firebase credentials.
         """
-        cred = credentials.Certificate("credentials.json")
+        if getattr(sys, 'frozen', False):
+            base_path = os.path.join(sys._MEIPASS, "src/credentials.json")
+        else:
+            base_path = "src/credentials.json"
+
+        cred = credentials.Certificate(base_path)
         firebase_admin.initialize_app(cred, {
             "databaseURL": "https://leafylegions-default-rtdb.firebaseio.com/"
         })

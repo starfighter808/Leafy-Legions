@@ -8,12 +8,12 @@ a type of Zombie/Entity on the Gameplay board
 from typing import TYPE_CHECKING
 
 # Local Imports
-from entities import Zombie
+from src.entities import Zombie
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
 if TYPE_CHECKING:
-    from managers import GameManager
+    from src.managers import GameManager
 
 
 class SpeedyZombie(Zombie):
@@ -35,6 +35,6 @@ class SpeedyZombie(Zombie):
 
         self.attributes = {
             "name": "Sprinter",
-            "images": ["assets/images/speedyZombie.png"],
+            "images": ["speedyZombie.png"],
             "description": "A blur of decayed flesh, dashing with alarming speed to catch its prey."
         }

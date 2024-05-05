@@ -14,7 +14,7 @@ import sys
 import pygame
 
 # Local Imports
-from managers import ScreenManager, SoundManager
+from src.managers import ScreenManager, SoundManager
 
 # Initialize Pygame
 pygame.init()
