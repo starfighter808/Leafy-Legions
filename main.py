@@ -22,7 +22,6 @@ pygame.init()
 # Set up the game window, scaled if needed
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-# Using common aspect ratio (1124x768)
 display: pygame.Surface = pygame.display.set_mode((1120, 720), pygame.SCALED)
 pygame.display.set_caption("Leafy Legions")
 
