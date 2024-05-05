@@ -265,6 +265,7 @@ class GameplayScreen(BaseScreen):
                 self.quit_button = None
                 self.return_button = None
                 self.game_paused = False
+                self.sound_manager.toggle_music()
             elif self.quit_button and self.quit_button.collidepoint(mouse_pos):
                 self.screen_manager.game_speed = 1
                 self.screen_manager.set_screen("MainMenuScreen")
@@ -289,6 +290,7 @@ class GameplayScreen(BaseScreen):
                     self.game_paused = True
                     self.held_item = None
                     self.reset_plant_buttons()
+                    self.sound_manager.toggle_music()
                 elif self.fast_forward_button and self.fast_forward_button.collidepoint(mouse_pos):
                     self.screen_manager.game_speed = 2 if self.screen_manager.game_speed == 1 else 1
                     self.held_item = None

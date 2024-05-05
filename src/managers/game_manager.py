@@ -27,7 +27,7 @@ class GameManager:
             Projectile: [],  # List to store instances of the Projectile class
         }
         self.__game_running: bool = False
-        self.sound_manager = SoundManager
+        self.sound_manager = SoundManager()
         self.__coins: int = 25  # Default: 25 coins
         self.__wave: int = 1    # Default: 1 wave
 

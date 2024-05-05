@@ -41,7 +41,7 @@ class BaseScreen(ABC):
         self.screen_manager = screen_manager
         self.display = display
         self.colors = ColorManager
-        self.sound_manager = SoundManager
+        self.sound_manager = SoundManager()
         self.button_hover_states = {}  # Dictionary to store hover states of buttons
         self.database_manager = self.screen_manager.database_manager
         pygame.display.set_caption(title)

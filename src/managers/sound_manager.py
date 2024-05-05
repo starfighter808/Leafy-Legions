@@ -17,6 +17,13 @@ class SoundManager:
     Functions to play sounds and music in the application
     """
 
+    def __init__(self):
+        """
+        Initialize a SoundManager object.
+        """
+        pygame.mixer.init()
+        self.paused = False
+
     @staticmethod
     def play_music(music_file: str, volume: float = 0.05) -> None:
         """
@@ -64,3 +71,12 @@ class SoundManager:
         else:
             raise FileNotFoundError(f"No sound effect at {sound_path}")
 
+    def toggle_music(self) -> None:
+        """
+        Pause music
+        """
+        if self.paused:
+            pygame.mixer.music.unpause()
+        else:
+            pygame.mixer.music.pause()
+        self.paused = not self.paused
