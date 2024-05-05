@@ -21,7 +21,8 @@ class Projectile(Entity):
     A Projectile is a moving entity that is shot
     from plants on the game board to hurt zombies.
     """
-    def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
+
+    def __init__(self, game_manager: 'GameManager', x: int, y: int, damage: int = 25) -> None:
         """
         Initializes a Projectile object.
 
@@ -29,11 +30,12 @@ class Projectile(Entity):
             game_manager (GameManager): An instance of the GameManager managing the projectile.
             x (int): The initial x-coordinate of the projectile.
             y (int): The initial y-coordinate of the projectile.
+            damage (int): The damage this projectile will deal. Default: 25
         """
         super().__init__(game_manager, x, y)
         self.image_size: tuple[int, int] = (25, 25)
         self.speed: float = 5.0
-        self.collided_with_zombie: bool = False  # Flag to indicate collision with a plant
+        self.damage = damage
 
         self.attributes = {
             "images": ["assets/images/projectile.png"]
@@ -46,7 +48,7 @@ class Projectile(Entity):
         Args:
             zombie (Zombie): The zombie object being attacked.
         """
-        zombie.health -= 25
+        zombie.health -= self.damage
         print(f"Projectile hit Zombie {zombie.x, zombie.y}. Health: {zombie.health}")
 
         if zombie.health <= 0:

@@ -34,7 +34,7 @@ class SpeedyZombie(Zombie):
         self.speed: float = 4.0
 
         self.attributes = {
-            "name": "The Sprinter",
+            "name": "Sprinter",
             "images": ["assets/images/speedyZombie.png"],
             "description": "A blur of decayed flesh, dashing with alarming speed to catch its prey."
         }

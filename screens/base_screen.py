@@ -44,8 +44,6 @@ class BaseScreen(ABC):
         self.database_manager = self.screen_manager.database_manager
         pygame.display.set_caption(title)
 
-        self.return_btn = None
-
     def display_message(self,
                         message: str,
                         font_color: tuple[int, int, int],
@@ -117,7 +115,9 @@ class BaseScreen(ABC):
                        button_position: tuple[float, float],
                        button_color: tuple[int, int, int] = None,
                        hover_color: tuple[int, int, int] = None,
+                       font_size: int = 36,
                        button_size: tuple[int, int] = (200, 50),
+                       offset_text: tuple = (0, 0),
                        alpha: int = 255
                        ) -> pygame.Rect:
         """
@@ -130,7 +130,9 @@ class BaseScreen(ABC):
                 Default: self.colors.GREEN
             hover_color (tuple[int, int, int]): Optional - The color of the button background when hovered.
                 Default: self.colors.LIGHT_BLUE
+            font_size (int): The size of the font. Default: 36
             button_size (tuple[int, int]):  The size of the button (width, height). Default: (200, 50)
+            offset_text (tuple): The offset of the text from the button position. Default: None
             alpha (int): The alpha value for transparency. Default: 255 (fully opaque)
 
         Returns:
@@ -141,7 +143,7 @@ class BaseScreen(ABC):
         if hover_color is None:
             hover_color = self.colors.LIGHT_BLUE
 
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font(None, font_size)
         button_text: pygame.Surface = font.render(message, True, self.colors.WHITE)
         button_text.set_alpha(alpha)
         button_rect = button_text.get_rect(topleft=button_position)
@@ -172,7 +174,9 @@ class BaseScreen(ABC):
             self.button_hover_states[button_pos_tuple] = False
 
         # Center text within the button
-        text_rect = button_text.get_rect(center=button_rect.center)
+        # Allow user to create an "offset" so that the text is not immediately centered
+        text_rect = button_text.get_rect(
+            center=(button_rect.center[0] + offset_text[0], button_rect.center[1] + offset_text[1]))
 
         self.display.blit(button_text, text_rect)
         return button_rect
@@ -198,6 +202,70 @@ class BaseScreen(ABC):
             image = pygame.transform.scale(image, image_size)
         image_rect = image.get_rect(center=image_position)
         self.display.blit(image, image_rect)
+
+    def display_button_image(self,
+                             image_filename: str,
+                             image_position: tuple[float, float],
+                             image_size: tuple[int, int],
+                             background_color: tuple[int, int, int] = None,
+                             hover_color: tuple[int, int, int] = None,
+                             ) -> pygame.Rect:
+        """
+        Display an image as a button on the current screen.
+
+        Args:
+            image_filename (str): The filename of the image located in "/assets/images/" directory.
+            image_position (tuple[float, float]): The position of the image (x, y).
+            image_size (tuple[int, int]): The size of the image (width, height).
+            background_color (tuple[int, int, int]): Optional - The color of the button background.
+                Default: self.colors.GREEN
+            hover_color (tuple[int, int, int]): Optional - The color of the button background when hovered.
+                Default: self.colors.LIGHT_BLUE
+        """
+        if background_color is None:
+            background_color = self.colors.GREEN
+        if hover_color is None:
+            hover_color = self.colors.LIGHT_BLUE
+
+        # Create a surface for the circular background
+        background = pygame.Surface(image_size)
+
+        # Check if the mouse is hovering over the button
+        mouse_pos = pygame.mouse.get_pos()
+        if (image_position[0] <= mouse_pos[0] <= image_position[0] + image_size[0]
+                and image_position[1] <= mouse_pos[1] <= image_position[1] + image_size[1]):
+            pygame.draw.circle(background, hover_color, (image_size[0] // 2, image_size[1] // 2), image_size[0] // 2)
+        else:
+            pygame.draw.circle(background, background_color, (image_size[0] // 2, image_size[1] // 2),
+                               image_size[0] // 2)
+
+        # Load, convert and scale the image
+        image = pygame.image.load(f"./assets/images/{image_filename}").convert_alpha()
+        image = pygame.transform.scale(image, image_size)
+
+        # Blit the image onto the center of the background
+        image_rect = image.get_rect(center=background.get_rect().center)
+        background.blit(image, image_rect)
+
+        # Blit the background onto the display
+        button_rect = background.get_rect(topleft=image_position)
+
+        # Draw the border
+        border_color = tuple(max(0, c - 15) for c in background_color)
+        pygame.draw.rect(self.display, background_color, button_rect, border_radius=5)
+        pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
+
+        # If there is a hover color and the mouse is over the button, draw the hover color
+        if hover_color and button_rect.collidepoint(pygame.mouse.get_pos()):
+            border_color = tuple(max(0, c - 60) for c in hover_color)
+            pygame.draw.rect(self.display, hover_color, button_rect, border_radius=5)
+            pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
+
+        # Blit the image directly onto the display
+        image_rect = image.get_rect(topleft=image_position)
+        self.display.blit(image, image_rect)
+
+        return image_rect
 
     @abstractmethod
     def render(self) -> None:

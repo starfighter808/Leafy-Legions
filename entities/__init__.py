@@ -9,9 +9,20 @@ from .projectile import Projectile
 from .plant import Plant
 from .speedy_zombie import SpeedyZombie
 from .hulking_zombie import HulkingZombie
-from .rose_plant import RosePlant 
 from .polymorph_zombie import PolymorphZombie
+from .big_plant import BigPlant
+from .rose_plant import RosePlant
 
-__all__ = ['Entity', 'Plant', 'Zombie', 'SpeedyZombie', 'Projectile', 'HulkingZombie', 'RosePlant', 'PolymorphZombie']
+__all__ = [
+    'Entity',
+    'Zombie',
+    'Projectile',
+    'Plant',
+    'SpeedyZombie',
+    'HulkingZombie',
+    'PolymorphZombie',
+    'BigPlant',
+    'RosePlant'
+]
 
 print("Loaded Module: Entities")

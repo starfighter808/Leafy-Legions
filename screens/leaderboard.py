@@ -66,7 +66,7 @@ class LeaderboardScreen(BaseScreen):
         for idx, entry in enumerate(display_data, start=start_index + 1):
             username = entry["username"]
             waves = entry["high_score"]
-            line = f"{idx}. {username}: Waves {waves}"
+            line = f"{idx}. {username}: Wave {waves}"
             self.display_message(message=line,
                                  font_color=self.colors.WHITE,
                                  text_position=(text_and_buttons_x, y),

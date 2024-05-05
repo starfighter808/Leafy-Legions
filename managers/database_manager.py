@@ -8,6 +8,7 @@ for managing the communication to Firebase
 import bcrypt
 import firebase_admin
 from firebase_admin import db, credentials
+from google.auth.exceptions import TransportError
 
 
 class DatabaseManager:
@@ -19,12 +20,11 @@ class DatabaseManager:
         Initialize the DatabaseManager using Firebase credentials.
         """
         cred = credentials.Certificate("credentials.json")
-        firebase_admin.initialize_app(cred,{
+        firebase_admin.initialize_app(cred, {
             "databaseURL": "https://leafylegions-default-rtdb.firebaseio.com/"
         })
 
         self.database = db.reference()
-        print("Firebase Connected")
 
         # Caching to prevent spamming API calls
         self.high_scores_cache = []
@@ -39,7 +39,13 @@ class DatabaseManager:
         if self.high_scores_cache:
             return self.high_scores_cache
 
-        res = self.database.child('user_data').order_by_child('high_score').get()
+        res = None
+        # If there is a network error (TransportError), return error
+        try:
+            # Find the password of the supplied username
+            res = self.database.child('user_data').order_by_child('high_score').get()
+        except TransportError:
+            return [{"username": "No Connection", "high_score": 0}]
 
         if isinstance(res, dict):  # Check if the result is a dictionary
             for username, user_data in res.items():  # Extract username and user data
@@ -100,8 +106,14 @@ class DatabaseManager:
         if not username or not password:
             return False
 
-        # Find the password of the supplied username
-        stored_hash = self.database.child('users').child(username).child('password').get()
+        stored_hash = None
+
+        # If there is a network error (TransportError), return false
+        try:
+            # Find the password of the supplied username
+            stored_hash = self.database.child('users').child(username).child('password').get()
+        except TransportError:
+            return False
 
         if not stored_hash:
             return False
@@ -135,7 +147,11 @@ class DatabaseManager:
             'high_score': new_high_score
         })
 
-        # Update the cache
+        # Get the current cache if it doesn't already exist
+        if not self.high_scores_cache:
+            self.high_scores_cache = self.get_high_scores()
+
+        # Update cache
         user_found = False
         for obj in self.high_scores_cache:
             if obj['username'] == username:

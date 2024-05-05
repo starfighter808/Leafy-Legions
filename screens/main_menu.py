@@ -37,6 +37,7 @@ class MainMenuScreen(BaseScreen):
         self.leaderboard_btn = None
         self.almanac_btn = None
         self.quit_btn = None
+        self.sound_manager.play_music('main_menu.mp3')
 
     def render(self) -> None:
         """

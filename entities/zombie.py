@@ -44,7 +44,7 @@ class Zombie(Entity):
 
         self.__last_attack: int = 0
         self.attributes = {
-            "name": "The Stumbler",
+            "name": "Stumbler",
             "images": ["assets/images/zombie_1.png", "assets/images/zombie_2.png"],
             "description": "Slow but relentless, it overwhelms defenses with sheer numbers."
         }
@@ -57,7 +57,7 @@ class Zombie(Entity):
             bool: True if the zombie can attack, False otherwise.
         """
         current_time: int = pygame.time.get_ticks()
-        return current_time - self.__last_attack >= 1000 / self.attack_speed
+        return current_time - self.__last_attack >= 1000 / (self.attack_speed * self.game_manager.game_speed)
 
     def attack_plant(self, plant: 'Plant') -> None:
         """
@@ -76,7 +76,6 @@ class Zombie(Entity):
             if plant.health <= 0:
                 print(f"Plant {plant.x, plant.y} has died")
                 self.game_manager.remove(plant)
-                self.collided_with_plant = False
 
     def update_position(self) -> None:
         """

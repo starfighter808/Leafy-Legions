@@ -5,6 +5,7 @@ This module contains the GameplayScreen class
 for managing the game itself when running
 """
 # Standard Imports
+import inspect
 import math
 import random
 import sys
@@ -14,6 +15,7 @@ from typing import TYPE_CHECKING
 # Library Imports
 import pygame
 
+import entities
 # Local Imports
 from entities import Plant, Projectile, SpeedyZombie, Zombie, PolymorphZombie, HulkingZombie
 from entities import __all__ as all_entities
@@ -104,6 +106,40 @@ class GameplayScreen(BaseScreen):
         self.background_img = scale_background('background.jpg')
         self.entity_imgs = load_and_scale_entity_images(sys.modules['entities'])
 
+        # Create plant topbar
+        self.plant_buttons = []
+        self.button_size = (130, 75)
+
+        # Create a list of all Plant classes
+        plant_classes = [cls for name, cls in inspect.getmembers(entities, inspect.isclass) if issubclass(cls, Plant)]
+
+        # Create instances of each plant class to access their cost, then sort by cost
+        self.plant_instances = [(plant_class(None, 0, 0), plant_class) for plant_class in plant_classes]
+        self.plant_instances = sorted(self.plant_instances, key=lambda instance: instance[0].cost)
+
+        # Create buttons for each plant
+        for i, (plant_instance, _) in enumerate(self.plant_instances):
+            button_position = (30 + self.button_size[0] + i * 160, 15)
+            self.plant_buttons.append({
+                "name": plant_instance.attributes["name"],  # The name of the plant
+                "cost": plant_instance.cost,  # The cost of the plant
+                "color": None,  # Use default button color
+                "hover_color": None,  # Use default button hover color
+                "position": button_position,  # Set button position
+            })
+            print(f"Plant {plant_instance.attributes['name']} button created at {button_position}")
+
+        # Create toolbar buttons
+        self.pause_button = None
+        self.game_paused = False
+        self.fast_forward_button = None
+        self.shovel_button = None
+        self.held_item: any = None
+
+        # Create pause screen buttons
+        self.return_button = None
+        self.quit_button = None
+
         # When all assets are loaded, start the game
         self.game_manager.set_game_status(True)
         self.sound_manager.play_music('gameplay.mp3')
@@ -185,17 +221,26 @@ class GameplayScreen(BaseScreen):
                         obj.animation_offset = random.randint(0, 10000)
 
                     # Calculate index of the image to display based on time
-                    image_index = ((current_time + obj.animation_offset) // 500) % len(images)
+                    image_index = ((current_time + obj.animation_offset) // (
+                            500 // self.screen_manager.game_speed)) % len(images)
                     self.display.blit(images[image_index], (cell_center_x, cell_center_y))
                 except (AttributeError, IndexError):
                     self.display.blit(images[0], (obj.x, obj.y + GRID_OFFSET))
+
+    def reset_plant_buttons(self) -> None:
+        """
+        Resets the color of all plant buttons to None.
+        """
+        for button_info in self.plant_buttons:
+            button_info["color"] = None
+            button_info["hover_color"] = None
 
     def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
         """
         Handle events on the gameplay screen.
 
         Args:
-            mouse_pos (Tuple[int, int]): The position of the mouse cursor.
+            mouse_pos (tuple[int, int]): The position of the mouse cursor.
         """
         super().handle_click_events(mouse_pos)
         mouse_x: int = mouse_pos[0]
@@ -203,25 +248,98 @@ class GameplayScreen(BaseScreen):
         grid_x: int = mouse_x // GRID_SIZE
         grid_y: int = (mouse_y - GRID_OFFSET) // GRID_SIZE
 
-        existing_plant: bool = any(plant.x == grid_x * GRID_SIZE
-                                   and plant.y == grid_y * GRID_SIZE for plant in self.plants)
+        click_in_grid: bool = (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT)
 
-        if not existing_plant and (0 <= grid_x < GRID_WIDTH) and (0 <= grid_y < GRID_HEIGHT):
-            # Plant a plant at the clicked position if it's within the grid
-            if self.game_manager.get_coins() >= PLANT_COST:
-                self.game_manager.remove_coins(PLANT_COST)
-                new_plant = Plant(self.game_manager, grid_x * GRID_SIZE, grid_y * GRID_SIZE)
-                self.game_manager.add(new_plant)
-                print(f"New Plant {new_plant.x, new_plant.y}. Health: {new_plant.health}")
+        # If the game is paused, handle return/quit buttons
+        if self.game_paused:
+            if self.return_button and self.return_button.collidepoint(mouse_pos):
+                self.quit_button = None
+                self.return_button = None
+                self.game_paused = False
+            elif self.quit_button and self.quit_button.collidepoint(mouse_pos):
+                self.screen_manager.game_speed = 1
+                self.screen_manager.set_screen("MainMenuScreen")
+
+        # Handle plant button clicks
+        for button_info, (_, plant_class) in zip(self.plant_buttons, self.plant_instances):
+            button_rect = pygame.Rect(button_info["position"], self.button_size)
+
+            if not self.game_paused:
+                if button_rect.collidepoint(mouse_pos) and self.game_manager.get_coins() >= button_info["cost"]:
+                    if self.held_item == plant_class:
+                        self.held_item = None
+                        self.reset_plant_buttons()
+                    else:
+                        self.held_item = plant_class
+                        button_info["color"] = self.colors.LIGHT_RED
+                        button_info["hover_color"] = self.colors.RED
+                else:
+                    button_info["color"] = None
+                    button_info["hover_color"] = None
+                if self.pause_button and self.pause_button.collidepoint(mouse_pos):
+                    self.game_paused = True
+                    self.held_item = None
+                    self.reset_plant_buttons()
+                elif self.fast_forward_button and self.fast_forward_button.collidepoint(mouse_pos):
+                    self.screen_manager.game_speed = 2 if self.screen_manager.game_speed == 1 else 1
+                    self.held_item = None
+                    self.reset_plant_buttons()
+                elif self.shovel_button and self.shovel_button.collidepoint(mouse_pos):
+                    if self.held_item == 'shovel':
+                        self.held_item = None
+                    else:
+                        self.held_item = 'shovel'
+                    self.reset_plant_buttons()
+
+        cell_x = grid_x * GRID_SIZE
+        cell_y = grid_y * GRID_SIZE
+        existing_plant: bool = any(plant.x == cell_x and plant.y == cell_y for plant in self.plants)
+
+        # If we click in the grid and there is a held item
+        if click_in_grid and self.held_item is not None:
+            # If we
+            if self.held_item != 'shovel':
+                if not existing_plant:
+                    new_plant = self.held_item(self.game_manager, cell_x, cell_y)
+                    if self.game_manager.get_coins() >= new_plant.cost:
+                        # If we have enough coins and can plant, remove the coins, plant it, and reset held_item
+                        self.game_manager.add(new_plant)
+                        self.game_manager.remove_coins(new_plant.cost)
+                        print(f"New {self.held_item.__name__} {new_plant.x, new_plant.y}. Health: {new_plant.health}")
+                        self.held_item = None
+                    else:
+                        # If we don't have enough coins, reset held_item and throw error
+                        self.held_item = None
+                        self.sound_manager.play_sound('error.mp3', 0.15)
+                else:
+                    # If there is already a plant in the cell, throw error
+                    self.sound_manager.play_sound('error.mp3', 0.15)
             else:
-                self.sound_manager.play_sound('error.mp3', 0.15)
-        else:
-            self.sound_manager.play_sound('error.mp3', 0.15)
+                # If we click in the grid with a shovel
+                for plant in self.plants:
+                    # And we click on a plant
+                    if plant.x == cell_x and plant.y == cell_y:
+                        # Remove the plant, give user half the coins back, & reset held item
+                        self.game_manager.remove(plant)
+                        self.game_manager.add_coins(plant.cost // 2)
+                        self.held_item = None
+                        break  # Stop looping through plants after it was removed
+
+    def render_held_item(self, item_image: pygame.Surface) -> None:
+        """
+        Renders the held item at the mouse cursor.
+        """
+        mouse_pos = pygame.mouse.get_pos()
+        self.display.blit(item_image,
+                          (mouse_pos[0] - item_image.get_width() // 2, mouse_pos[1] - item_image.get_height() // 2))
 
     def render(self) -> None:
         """
         Render the gameplay screen.
         """
+        # Copy the speed over to game manager so entities can access it
+        self.game_manager.game_speed = self.screen_manager.game_speed
+
         self.display.fill(self.colors.BROWN)
         self.draw_grid_and_entities(self.game_manager.get_entities())
         self.display_message(message=f"Coins: {self.game_manager.get_coins()}",
@@ -234,35 +352,146 @@ class GameplayScreen(BaseScreen):
                              text_position=(15, 50),
                              text_align="topleft"
                              )
+        # Draw plant buttons
+        for button in self.plant_buttons:
+
+            # Disable buttons if user does not have enough coins
+            if self.game_manager.get_coins() < button["cost"]:
+                button_color = self.colors.GRAY
+                hover_color = self.colors.GRAY
+            else:
+                button_color = button["color"]
+                hover_color = button["hover_color"]
+
+            self.display_button(
+                message=button["name"],
+                button_position=button["position"],
+                button_color=button_color,
+                hover_color=hover_color,
+                button_size=self.button_size,
+                offset_text=(0, -8),  # Move text up slightly to fit cost under it
+                font_size=36
+            )
+            # Add cost within the button position, slightly lower than the current text
+            cost_position = (button["position"][0] + (self.button_size[0] // 2), button["position"][1] + 52)
+            self.display_message(
+                message=f"Cost: {button['cost']}",
+                font_color=self.colors.WHITE,
+                text_position=cost_position,
+                text_align="center",
+                font_size=24
+            )
+        btn_x = self.display.get_width() - 200
+        btn_y = 25
+        btn_padding = 70
+        btn_size = (50, 50)
+        self.pause_button = self.display_button_image(
+            image_filename='pause_icon.png',
+            image_size=btn_size,
+            image_position=(btn_x, btn_y),
+            background_color=self.colors.LIGHT_RED
+            if self.game_paused is True
+            else None,
+            hover_color=self.colors.RED
+            if self.game_paused is True
+            else None
+        )
+        self.fast_forward_button = self.display_button_image(
+            image_filename='fast_forward_icon.png',
+            image_size=btn_size,
+            image_position=(btn_x + btn_padding, btn_y),
+            background_color=self.colors.LIGHT_RED
+            if self.screen_manager.game_speed == 2
+            else None,
+            hover_color=self.colors.RED
+            if self.screen_manager.game_speed == 2
+            else None
+        )
+        shovel_active: bool = self.held_item == 'shovel'
+        self.shovel_button = self.display_button_image(
+            image_filename='shovel_icon.png',
+            image_size=btn_size,
+            image_position=(btn_x + (btn_padding * 2), btn_y),
+            background_color=self.colors.LIGHT_RED
+            if shovel_active is True
+            else None,
+            hover_color=self.colors.RED
+            if shovel_active is True
+            else None
+        )
+
+        if self.held_item is not None:
+            if self.held_item == 'shovel':
+                shovel_image = pygame.image.load('./assets/images/shovel_icon.png')
+                shovel_image = pygame.transform.scale(shovel_image, (50, 50))
+                self.render_held_item(shovel_image)
+            elif issubclass(self.held_item, Plant):
+                plant_image = self.entity_imgs[self.held_item][0]
+                self.render_held_item(plant_image)
 
         # If no zombies are on the board, spawn new ones + update wave
         if not self.game_manager.get_entities(Zombie):
             self.begin_wave()
             self.game_manager.update_wave()
 
-        # Auto sets the Collision false to fix the collision issue when
-        # Attacking plants
-        for zombie in self.zombies:
-            zombie.collided_with_plant = False
-
-        for plant in self.plants:
+        # If the game is not paused
+        if not self.game_paused:
+            # Auto sets the Collision false to fix the collision issue when
+            # Attacking plants
             for zombie in self.zombies:
-                if zombie.y == plant.y:
-                    # If a Zombie is inside the Plant's cell
-                    if zombie.x <= plant.x <= zombie.x + GRID_SIZE:
-                        zombie.attack_plant(plant)
+                zombie.collided_with_plant = False
 
-                    # Ensure the zombie is visible on the board, in front of the plant
-                    if plant.x <= zombie.x <= self.display.get_width() - 30:
-                        plant.shoot_projectile()
+            for plant in self.plants:
+                for zombie in self.zombies:
+                    if zombie.y == plant.y:
+                        # If a Zombie is inside the Plant's cell
+                        if zombie.x <= plant.x <= zombie.x + GRID_SIZE:
+                            zombie.attack_plant(plant)
 
-        for zombie in self.zombies:
-            zombie.update_position()
+                        # Ensure the zombie is visible on the board, in front of the plant
+                        if plant.x <= zombie.x <= self.display.get_width() - 30:
+                            plant.shoot_projectile()
+
+            for zombie in self.zombies:
+                zombie.update_position()
+                for projectile in self.projectiles:
+                    if zombie.y == projectile.y and zombie.x <= projectile.x <= zombie.x + GRID_SIZE:
+                        projectile.attack_zombie(zombie)
             for projectile in self.projectiles:
-                if zombie.y == projectile.y and zombie.x <= projectile.x <= zombie.x + GRID_SIZE:
-                    projectile.attack_zombie(zombie)
-        for projectile in self.projectiles:
-            projectile.update_position()
+                projectile.update_position()
+
+        # If the game is paused
+        else:
+            # Create a semi-transparent surface
+            pause_surface = pygame.Surface(self.display.get_size())
+            pause_surface.fill(self.colors.BLACK)
+            pause_surface.set_alpha(128)  # Adjust alpha level to make it semi-transparent
+
+            # Blit the semi-transparent surface onto the display
+            self.display.blit(pause_surface, (0, 0))
+
+            # Display "Game Paused" message
+            self.display_message(
+                message="Game Paused",
+                font_color=self.colors.WHITE,
+                text_position=(self.display.get_width() // 2, self.display.get_height() // 2 - 100),
+                font_size=72
+            )
+
+            # Display "Quit" (Left) and "Return" (Right) buttons
+            self.quit_button = self.display_button(
+                message="Quit",
+                button_color=self.colors.LIGHT_RED,
+                hover_color=self.colors.RED,
+                button_position=(self.display.get_width() // 2 - 175, self.display.get_height() // 2),
+                button_size=(150, 50)
+            )
+
+            self.return_button = self.display_button(
+                message="Return",
+                button_position=(self.display.get_width() // 2 + 20, self.display.get_height() // 2),
+                button_size=(150, 50)
+            )
 
         # Check if any zombie go outside the screen
         if any(zombie.x <= -GRID_SIZE for zombie in self.zombies):
@@ -280,4 +509,5 @@ class GameplayScreen(BaseScreen):
                 pygame.display.flip()
                 pygame.time.delay(15)
             self.database_manager.update_high_score(self.screen_manager.user_logged_in, wave)
+            self.screen_manager.game_speed = 1
             self.screen_manager.set_screen("YouLostScreen")

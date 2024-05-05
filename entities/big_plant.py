@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class BigPlant(Plant):
     """
-    A BigPlant is a type of Plant with increased health and cost.
+    A BigPlant is a type of Plant with increased health and damage, but higher cost.
     """
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
@@ -31,10 +31,12 @@ class BigPlant(Plant):
         """
         super().__init__(game_manager, x, y)
         self.health: int = 400
-        self.cost: int = 30
+        self.damage: int = 35
+        self.cost: int = 65
 
         self.attributes = {
-            "name": "The Green Giant",
+            "name": "Giant",
             "images": ["assets/images/big_plant.png"],
-            "description": "A towering plant with increased health, it stands as a formidable barrier against zombies."
+            "description": "A towering plant with increased health and damage, it stands as a formidable barrier "
+                           "against zombies."
         }

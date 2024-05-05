@@ -36,7 +36,7 @@ class HulkingZombie(Zombie):
         self.damage: int = 150
 
         self.attributes = {
-            "name": "The Behemoth",
+            "name": "Behemoth",
             "images": ["assets/images/hulk_zombie.png"],
             "description": "A towering zombie with immense strength and resilience, it crushes plants in its path."
         }

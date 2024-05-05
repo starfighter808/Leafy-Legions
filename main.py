@@ -32,7 +32,6 @@ sound_manager = SoundManager
 
 # Set the default screen to the Main Menu
 screen_manager.set_screen("MainMenuScreen")
-sound_manager.play_music('main_menu.mp3')
 
 # Main game loop
 while screen_manager.is_running():
@@ -63,7 +62,10 @@ while screen_manager.is_running():
         screen_manager.run_current_screen()
 
     pygame.display.flip()
-    pygame.time.delay(60)  # 60 FPS
+
+    # Use 60 FPS
+    # Divide by the game speed (for 2x support)
+    pygame.time.delay(60 // screen_manager.game_speed)
 
 # If no screens are being displayed, close pygame and app
 pygame.quit()

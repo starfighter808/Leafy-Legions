@@ -32,9 +32,10 @@ class RosePlant(Plant):
         super().__init__(game_manager, x, y)
         self.health: int = 75  # Health of the plants
         self.attack_speed: float = 2.0
+        self.cost = 45
 
         self.attributes = {
-            "name": "The Thorny Guardian",
+            "name": "Rose",
             "images": ["assets/images/rose_plant.png"],
             "description": "A delicate but deadly plant, its rapid-fire thorns keep zombies at bay."
         }

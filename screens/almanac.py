@@ -89,7 +89,7 @@ class AlmanacScreen(BaseScreen):
                                image_size=(396, 474)
                                )
 
-            self.display_message(message=attributes["name"],
+            self.display_message(message=f"The {attributes['name']}",
                                  font_color=self.colors.WHITE,
                                  text_position=(x, y - 220)
                                  )

@@ -34,7 +34,9 @@ class Plant(Entity):
             y (int): The initial y-coordinate of the plant.
         """
         super().__init__(game_manager, x, y)
-        self.health: int = 150  # Health of the plant
+        self.health: int = 150  # Health of this plant
+        self.damage: int = 25  # The damage this plant deals per projectile
+        self.cost: int = 15  # The cost of this plant
 
         self.attack_speed: float = 1.0
         self.__last_attack: int = 0
@@ -42,7 +44,7 @@ class Plant(Entity):
             self.sound_manager.play_sound('plant.ogg')
 
         self.attributes = {
-            "name": "The Cowboy",
+            "name": "Cowboy",
             "images": ["assets/images/plant.png"],
             "description": "A sharpshooting sentinel, it wrangles foes with quick reflexes and summons allies."
         }
@@ -55,7 +57,7 @@ class Plant(Entity):
             bool: True if the plant can attack, False otherwise.
         """
         current_time: int = pygame.time.get_ticks()
-        return current_time - self.__last_attack >= 1000 / self.attack_speed
+        return current_time - self.__last_attack >= 1000 / (self.attack_speed * self.game_manager.game_speed)
 
     def shoot_projectile(self) -> None:
         """
@@ -65,5 +67,5 @@ class Plant(Entity):
             self.__last_attack = pygame.time.get_ticks()
             self.sound_manager.play_sound('shoot.ogg')
 
-            new_projectile = Projectile(self.game_manager, self.x + 75, self.y)
+            new_projectile = Projectile(self.game_manager, self.x + 75, self.y, self.damage)
             self.game_manager.add(new_projectile)

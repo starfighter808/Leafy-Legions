@@ -49,6 +49,7 @@ class ScreenManager:
         self.current_screen = None
         self.valid_screens: list[str] = _get_valid_screens()
         self.user_logged_in = None
+        self.game_speed = 1
 
     def is_running(self):
         """
