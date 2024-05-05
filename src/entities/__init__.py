@@ -10,6 +10,7 @@ from .plant import Plant
 from .speedy_zombie import SpeedyZombie
 from .hulking_zombie import HulkingZombie
 from .polymorph_zombie import PolymorphZombie
+from .apple_projectile import AppleProjectile
 from .big_plant import BigPlant
 from .rose_plant import RosePlant
 
@@ -21,6 +22,7 @@ __all__ = [
     'SpeedyZombie',
     'HulkingZombie',
     'PolymorphZombie',
+    'AppleProjectile',
     'BigPlant',
     'RosePlant'
 ]

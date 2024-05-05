@@ -22,7 +22,7 @@ class Projectile(Entity):
     from plants on the game board to hurt zombies.
     """
 
-    def __init__(self, game_manager: 'GameManager', x: int, y: int, damage: int = 25) -> None:
+    def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a Projectile object.
 
@@ -30,12 +30,11 @@ class Projectile(Entity):
             game_manager (GameManager): An instance of the GameManager managing the projectile.
             x (int): The initial x-coordinate of the projectile.
             y (int): The initial y-coordinate of the projectile.
-            damage (int): The damage this projectile will deal. Default: 25
         """
         super().__init__(game_manager, x, y)
         self.image_size: tuple[int, int] = (25, 25)
         self.speed: float = 5.0
-        self.damage = damage
+        self.damage = 25
 
         self.attributes = {
             "images": ["projectile.png"]

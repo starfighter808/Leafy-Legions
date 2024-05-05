@@ -35,7 +35,7 @@ class Plant(Entity):
         """
         super().__init__(game_manager, x, y)
         self.health: int = 150  # Health of this plant
-        self.damage: int = 25  # The damage this plant deals per projectile
+        self.projectile_type: type[Projectile] = Projectile  # The type of projectile to shoot
         self.cost: int = 15  # The cost of this plant
 
         self.attack_speed: float = 1.0
@@ -46,7 +46,7 @@ class Plant(Entity):
         self.attributes = {
             "name": "Cowboy",
             "images": ["plant.png"],
-            "description": "A sharpshooting sentinel, it wrangles foes with quick reflexes and summons allies."
+            "description": "A sharpshooting sentinel, it wrangles foes with quick reflexes."
         }
 
     def __can_attack(self) -> bool:
@@ -67,5 +67,5 @@ class Plant(Entity):
             self.__last_attack = pygame.time.get_ticks()
             self.sound_manager.play_sound('shoot.ogg')
 
-            new_projectile = Projectile(self.game_manager, self.x + 75, self.y, self.damage)
+            new_projectile = self.projectile_type(self.game_manager, self.x + 75, self.y)
             self.game_manager.add(new_projectile)

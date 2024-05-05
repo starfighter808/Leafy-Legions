@@ -37,6 +37,6 @@ class PolymorphZombie(Zombie):
         self.attributes = {
             "name": "Shapeshifter",
             "images": ["polymorph_zombie.png"],
-            "description": "A formidable zombie with increased health and speed, it adapts to its surroundings for "
+            "description": "A formidable zombie with high health and speed, it adapts to its surroundings for "
                            "survival."
         }
