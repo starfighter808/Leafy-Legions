@@ -132,8 +132,8 @@ class GameplayScreen(BaseScreen):
             self.plant_buttons.append({
                 "name": plant_instance.attributes["name"],  # The name of the plant
                 "cost": plant_instance.cost,  # The cost of the plant
-                "color": None,  # Use default button color
-                "hover_color": None,  # Use default button hover color
+                "color": self.colors.GREEN,
+                "hover_color": self.colors.LIGHT_BLUE,
                 "position": button_position,  # Set button position
             })
             print(f"Plant {plant_instance.attributes['name']} button created at {button_position}")
@@ -241,8 +241,8 @@ class GameplayScreen(BaseScreen):
         Resets the color of all plant buttons to None.
         """
         for button_info in self.plant_buttons:
-            button_info["color"] = None
-            button_info["hover_color"] = None
+            button_info["color"] = self.colors.GREEN
+            button_info["hover_color"] = self.colors.LIGHT_BLUE
 
     def handle_click_events(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -283,8 +283,8 @@ class GameplayScreen(BaseScreen):
                         button_info["color"] = self.colors.LIGHT_RED
                         button_info["hover_color"] = self.colors.RED
                 else:
-                    button_info["color"] = None
-                    button_info["hover_color"] = None
+                    button_info["color"] = self.colors.GREEN
+                    button_info["hover_color"] = self.colors.LIGHT_BLUE
                 if self.pause_button and self.pause_button.collidepoint(mouse_pos):
                     self.game_paused = True
                     self.held_item = None
@@ -306,7 +306,7 @@ class GameplayScreen(BaseScreen):
 
         # If we click in the grid and there is a held item
         if click_in_grid and self.held_item is not None:
-            # If we
+            # If we do not have the shovel
             if self.held_item != 'shovel':
                 if not existing_plant:
                     new_plant = self.held_item(self.game_manager, cell_x, cell_y)
@@ -322,6 +322,8 @@ class GameplayScreen(BaseScreen):
                         self.sound_manager.play_sound('error.mp3', 0.15)
                 else:
                     # If there is already a plant in the cell, throw error
+                    self.held_item = None
+                    self.reset_plant_buttons()
                     self.sound_manager.play_sound('error.mp3', 0.15)
             else:
                 # If we click in the grid with a shovel
@@ -372,6 +374,10 @@ class GameplayScreen(BaseScreen):
                 button_color = button["color"]
                 hover_color = button["hover_color"]
 
+            # Remove hover effects when game is paused
+            if self.game_paused:
+                hover_color = button_color
+
             self.display_button(
                 message=button["name"],
                 button_position=button["position"],
@@ -394,39 +400,42 @@ class GameplayScreen(BaseScreen):
         btn_y = 25
         btn_padding = 70
         btn_size = (50, 50)
+
+        pause_color = self.colors.LIGHT_RED if self.game_paused is True else self.colors.GREEN
+        pause_hover_color = self.colors.RED if self.game_paused is True else self.colors.LIGHT_BLUE
+
+        fast_forward_color = self.colors.LIGHT_RED if self.screen_manager.game_speed == 2 else self.colors.GREEN
+        fast_forward_hover_color = self.colors.RED if self.screen_manager.game_speed == 2 else self.colors.LIGHT_BLUE
+
+        shovel_color = self.colors.LIGHT_RED if self.held_item == 'shovel' else self.colors.GREEN
+        shovel_hover_color = self.colors.RED if self.held_item == 'shovel' else self.colors.LIGHT_BLUE
+
+        # Remove hover effects when game is paused
+        if self.game_paused:
+            pause_hover_color = pause_color
+            fast_forward_hover_color = fast_forward_color
+            shovel_hover_color = shovel_color
+
         self.pause_button = self.display_button_image(
             image_filename='pause_icon.png',
             image_size=btn_size,
             image_position=(btn_x, btn_y),
-            background_color=self.colors.LIGHT_RED
-            if self.game_paused is True
-            else None,
-            hover_color=self.colors.RED
-            if self.game_paused is True
-            else None
+            background_color=pause_color,
+            hover_color=pause_hover_color
         )
         self.fast_forward_button = self.display_button_image(
             image_filename='fast_forward_icon.png',
             image_size=btn_size,
             image_position=(btn_x + btn_padding, btn_y),
-            background_color=self.colors.LIGHT_RED
-            if self.screen_manager.game_speed == 2
-            else None,
-            hover_color=self.colors.RED
-            if self.screen_manager.game_speed == 2
-            else None
+            background_color=fast_forward_color,
+            hover_color=fast_forward_hover_color
         )
-        shovel_active: bool = self.held_item == 'shovel'
         self.shovel_button = self.display_button_image(
             image_filename='shovel_icon.png',
             image_size=btn_size,
             image_position=(btn_x + (btn_padding * 2), btn_y),
-            background_color=self.colors.LIGHT_RED
-            if shovel_active is True
-            else None,
-            hover_color=self.colors.RED
-            if shovel_active is True
-            else None
+            background_color=shovel_color,
+            hover_color=shovel_hover_color
         )
 
         if self.held_item is not None:

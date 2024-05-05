@@ -259,6 +259,8 @@ class BaseScreen(ABC):
         # Blit the background onto the display
         button_rect = background.get_rect(topleft=image_position)
 
+        button_pos_tuple = (button_rect.x, button_rect.y)
+
         # Draw the border
         border_color = tuple(max(0, c - 15) for c in background_color)
         pygame.draw.rect(self.display, background_color, button_rect, border_radius=5)
@@ -266,9 +268,18 @@ class BaseScreen(ABC):
 
         # If there is a hover color and the mouse is over the button, draw the hover color
         if hover_color and button_rect.collidepoint(pygame.mouse.get_pos()):
-            border_color = tuple(max(0, c - 60) for c in hover_color)
-            pygame.draw.rect(self.display, hover_color, button_rect, border_radius=5)
-            pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
+            # Ensure button is not disabled:
+            if hover_color is not background_color:
+                border_color = tuple(max(0, c - 60) for c in hover_color)
+                pygame.draw.rect(self.display, hover_color, button_rect, border_radius=5)
+                pygame.draw.rect(self.display, border_color, button_rect, border_radius=5, width=2)
+
+                # Play sound if not already played
+                if not self.button_hover_states.get(button_pos_tuple, False):
+                    self.button_hover_states[button_pos_tuple] = True
+                    self.sound_manager.play_sound('button_hover.mp3')
+        else:
+            self.button_hover_states[button_pos_tuple] = False
 
         # Blit the image directly onto the display
         image_rect = image.get_rect(topleft=image_position)
