@@ -540,3 +540,5 @@ class GameplayScreen(BaseScreen):
         if key_pressed == pygame.K_ESCAPE:
             self.game_paused = not self.game_paused
             self.sound_manager.toggle_music()
+            self.held_item = None
+            self.reset_plant_buttons()
