@@ -535,3 +535,8 @@ class GameplayScreen(BaseScreen):
             self.database_manager.update_high_score(self.screen_manager.user_logged_in, wave)
             self.screen_manager.game_speed = 1
             self.screen_manager.set_screen("YouLostScreen")
+
+    def handle_key_events(self, key_pressed: int, unicode_char: str) -> None:
+        if key_pressed == pygame.K_ESCAPE:
+            self.game_paused = not self.game_paused
+            self.sound_manager.toggle_music()
