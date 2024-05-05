@@ -11,7 +11,7 @@ import inspect
 import pygame
 
 # Local Imports
-from src.managers import DatabaseManager
+from src.managers import DatabaseManager, SoundManager
 from src import screens
 
 
@@ -45,6 +45,7 @@ class ScreenManager:
         """
         self.__running = True
         self.database_manager = DatabaseManager()
+        self.sound_manager = SoundManager()
         self.display = display
         self.current_screen = None
         self.valid_screens: list[str] = _get_valid_screens()

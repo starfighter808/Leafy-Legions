@@ -28,7 +28,7 @@ pygame.display.set_caption("Leafy Legions")
 
 # Create an instance of ScreenManager
 screen_manager = ScreenManager(display)
-sound_manager = SoundManager()
+sound_manager = screen_manager.sound_manager
 
 # Set the default screen to the Main Menu
 screen_manager.set_screen("MainMenuScreen")

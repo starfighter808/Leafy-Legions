@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 import pygame
 
 # Local Imports
-from src.managers import ColorManager, SoundManager
+from src.managers import ColorManager
 
 # The following packages are imported only for type hinting.
 # They are not used in this package, preventing circular dependency errors.
@@ -41,7 +41,7 @@ class BaseScreen(ABC):
         self.screen_manager = screen_manager
         self.display = display
         self.colors = ColorManager
-        self.sound_manager = SoundManager()
+        self.sound_manager = self.screen_manager.sound_manager
         self.button_hover_states = {}  # Dictionary to store hover states of buttons
         self.database_manager = self.screen_manager.database_manager
         pygame.display.set_caption(title)

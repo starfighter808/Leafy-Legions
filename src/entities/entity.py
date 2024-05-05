@@ -32,7 +32,8 @@ class Entity:
         self.game_manager = game_manager
         self.x = x
         self.y = y
-        self.sound_manager = SoundManager()
+        if game_manager:
+            self.sound_manager = game_manager.sound_manager
 
         self.attributes = {
             "images": []

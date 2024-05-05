@@ -23,9 +23,9 @@ class SoundManager:
         """
         pygame.mixer.init()
         self.paused = False
+        self.currently_playing = None
 
-    @staticmethod
-    def play_music(music_file: str, volume: float = 0.05) -> None:
+    def play_music(self, music_file: str, volume: float = 0.05) -> None:
         """
         Play music
 
@@ -42,11 +42,13 @@ class SoundManager:
             music_path = f"src/assets/music/{music_file}"
 
         if os.path.exists(music_path):
-            pygame.mixer.music.load(music_path)
-            pygame.mixer.music.set_volume(volume)
-            pygame.mixer.music.play(-1)
+            if self.currently_playing != music_path:
+                pygame.mixer.music.load(music_path)
+                pygame.mixer.music.set_volume(volume)
+                pygame.mixer.music.play(-1)
+                self.currently_playing = music_path
         else:
-            raise FileNotFoundError(f"No sound effect at {music_path}")
+            raise FileNotFoundError(f"No music file at {music_path}")
 
     @staticmethod
     def play_sound(effect_file: str, volume: float = 0.05) -> None:
