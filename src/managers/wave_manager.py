@@ -19,7 +19,6 @@ class WaveManager:
     The WaveManager class is responsible for
     managing the spawning of zombies in the game.
     """
-
     def __init__(self, game_manager: GameManager) -> None:
         """
         Initialize a new WaveManager instance.

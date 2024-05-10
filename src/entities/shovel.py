@@ -23,7 +23,6 @@ class Shovel(Entity):
     """
     The Shovel is used to remove plants from the game board.
     """
-
     def __init__(self, game_manager: 'GameManager', x: int, y: int) -> None:
         """
         Initializes a Shovel object.

@@ -24,7 +24,6 @@ class GameManager:
     The GameManager class is responsible for managing entities on the game board,
     along with the application and game running statuses.
     """
-
     def __init__(self, sound_manager: 'SoundManager') -> None:
         """
         Initialize a GameManager object.

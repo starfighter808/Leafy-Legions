@@ -100,7 +100,6 @@ class GameplayScreen(BaseScreen):
     """
     The GameplayScreen renders the game itself
     """
-
     def __init__(self, screen_manager: 'ScreenManager', display: Surface) -> None:
         """
         Initialize the Gameplay screen.
