@@ -92,7 +92,7 @@ class MainMenuScreen(BaseScreen):
                                             )
 
         # Add a logo to the top of the screen
-        self.display_image(image_filename="rellisLogo.png",
+        self.display_image(image_filename="screens/rellisLogo.png",
                            image_position=(self.display.get_width() // 2, self.image_y),
                            image_size=(150, 169)
                            )

@@ -4,6 +4,7 @@ Leafy Legions Entities Module
 This module is for importing each of the various entities (i.e. Plant)
 """
 from .entity import Entity
+from .shovel import Shovel
 from .zombie import Zombie
 from .projectile import Projectile
 from .plant import Plant
@@ -16,6 +17,7 @@ from .rose_plant import RosePlant
 
 __all__ = [
     'Entity',
+    'Shovel',
     'Zombie',
     'Projectile',
     'Plant',

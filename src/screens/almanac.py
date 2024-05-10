@@ -84,7 +84,7 @@ class AlmanacScreen(BaseScreen):
         text_and_buttons_x = x - (x * 0.32)
         for attributes in display_data:
             # Add the almanac background
-            self.display_image(image_filename="almanac.png",
+            self.display_image(image_filename="screens/almanac.png",
                                image_position=(x, y),
                                image_size=(396, 474)
                                )
@@ -94,7 +94,7 @@ class AlmanacScreen(BaseScreen):
                                  text_position=(x, y - 220)
                                  )
 
-            self.display_image(image_filename=attributes["images"],
+            self.display_image(image_filename=f"entities/{attributes["images"]}",
                                image_position=(x, y - 85),
                                image_size=(140, 140)
                                )

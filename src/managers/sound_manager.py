@@ -16,13 +16,14 @@ class SoundManager:
     """
     Functions to play sounds and music in the application
     """
-
     def __init__(self):
         """
         Initialize a SoundManager object.
         """
         pygame.mixer.init()
         self.paused = False
+        self.muted = False
+        self.volume = 0.05
         self.currently_playing = None
 
     def play_music(self, music_file: str, volume: float = 0.05) -> None:
@@ -43,6 +44,7 @@ class SoundManager:
 
         if os.path.exists(music_path):
             if self.currently_playing != music_path:
+                self.volume = volume
                 pygame.mixer.music.load(music_path)
                 pygame.mixer.music.set_volume(volume)
                 pygame.mixer.music.play(-1)
@@ -50,8 +52,7 @@ class SoundManager:
         else:
             raise FileNotFoundError(f"No music file at {music_path}")
 
-    @staticmethod
-    def play_sound(effect_file: str, volume: float = 0.05) -> None:
+    def play_sound(self, effect_file: str, volume: float = 0.05) -> None:
         """
         Play sound effect
 
@@ -67,18 +68,51 @@ class SoundManager:
         else:
             sound_path = f"src/assets/sounds/{effect_file}"
         if os.path.exists(sound_path):
-            sound = pygame.mixer.Sound(sound_path)
-            sound.set_volume(volume)
-            sound.play()
+            if not self.muted:
+                sound = pygame.mixer.Sound(sound_path)
+                sound.set_volume(volume)
+                sound.play()
         else:
             raise FileNotFoundError(f"No sound effect at {sound_path}")
 
-    def toggle_music(self) -> None:
+    def toggle_music(self, option: bool = None) -> None:
         """
         Pause music
         """
-        if self.paused:
-            pygame.mixer.music.unpause()
+        if option is not None:
+            self.paused = option
+            if self.paused:
+                pygame.mixer.music.pause()
+            else:
+                pygame.mixer.music.unpause()
         else:
-            pygame.mixer.music.pause()
-        self.paused = not self.paused
+            if self.paused:
+                pygame.mixer.music.unpause()
+            else:
+                pygame.mixer.music.pause()
+            self.paused = not self.paused
+
+    def mute_sounds(self, option: bool = None) -> None:
+        """
+        Mute music
+        """
+        if option is not None:
+            self.muted = option
+            if self.muted:
+                pygame.mixer.music.set_volume(0)
+            else:
+                pygame.mixer.music.set_volume(self.volume)
+        else:
+            if self.muted:
+                pygame.mixer.music.set_volume(self.volume)
+            else:
+                pygame.mixer.music.set_volume(0)
+            self.muted = not self.muted
+
+    def reset(self) -> None:
+        """
+        Resets the sound manager state
+        """
+        self.toggle_music(False)
+        self.mute_sounds(False)
+        self.currently_playing = None

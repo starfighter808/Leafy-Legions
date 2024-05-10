@@ -192,7 +192,7 @@ class BaseScreen(ABC):
         Display an image on the current screen.
 
         Args:
-            image_filename (str): The filename of the image located in "/src/assets/images/" directory.
+            image_filename (str): The filename of the image located in "/src/assets/images/..." directory.
             image_position (tuple[float, float]): The position of the image (x, y).
             image_size (tuple[int, int]): The size of the image (width, height).
         """
@@ -218,7 +218,7 @@ class BaseScreen(ABC):
         Display an image as a button on the current screen.
 
         Args:
-            image_filename (str): The filename of the image located in "/src/assets/images/" directory.
+            image_filename (str): The filename of the image located in "/src/assets/images/..." directory.
             image_position (tuple[float, float]): The position of the image (x, y).
             image_size (tuple[int, int]): The size of the image (width, height).
             background_color (tuple[int, int, int]): Optional - The color of the button background.

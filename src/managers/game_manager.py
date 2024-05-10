@@ -5,9 +5,16 @@ This module contains the GameManager class
 for managing everything happening after the
 user presses on the "Start" button
 """
+# Standard Imports
+from typing import TYPE_CHECKING
+
 # Local Imports
 from src.entities import Plant, Zombie, Projectile
-from src.managers import SoundManager
+
+# The following packages are imported only for type hinting.
+# They are not used in this package, preventing circular dependency errors.
+if TYPE_CHECKING:
+    from src.managers import SoundManager
 
 Entity = Zombie | Plant | Projectile
 
@@ -17,7 +24,8 @@ class GameManager:
     The GameManager class is responsible for managing entities on the game board,
     along with the application and game running statuses.
     """
-    def __init__(self) -> None:
+
+    def __init__(self, sound_manager: 'SoundManager') -> None:
         """
         Initialize a GameManager object.
         """
@@ -27,9 +35,8 @@ class GameManager:
             Projectile: [],  # List to store instances of the Projectile class
         }
         self.__game_running: bool = False
-        self.sound_manager = SoundManager()
+        self.sound_manager = sound_manager
         self.__coins: int = 25  # Default: 25 coins
-        self.__wave: int = 1    # Default: 1 wave
 
     def __validate_entity(self, entity: Entity) -> type[Entity]:
         """
@@ -112,18 +119,6 @@ class GameManager:
         for entity in self.__entities:
             self.clear_entities(entity)
         self.__coins = 25
-        self.__wave = 1
-
-    def set_game_status(self, game_running: bool) -> None:
-        """
-        Set the status of the game running and resets board state
-
-        Args:
-            game_running (bool): The status of the game.
-        """
-        self.__game_running = game_running
-        if not self.__game_running:
-            self.reset()
 
     def get_coins(self) -> int:
         """
@@ -146,15 +141,3 @@ class GameManager:
         Remove users' coins
         """
         self.__coins -= coins
-
-    def get_wave(self) -> int:
-        """
-        Return the current wave
-        """
-        return self.__wave
-
-    def update_wave(self) -> None:
-        """
-        Increase the wave
-        """
-        self.__wave += 1
