@@ -141,6 +141,8 @@ class SignInSignUpScreen(BaseScreen):
                     self.screen_manager.set_screen("MainMenuScreen")
                     self.screen_manager.user_logged_in = self.username_text
                 else:
+                    self.screen_manager.set_screen("MainMenuScreen")
+                    self.screen_manager.user_logged_in = "NoData"
                     if self.username_text == '' or self.password_text == '':
                         self.error_text = "Username and password cannot be blank"
                     else:

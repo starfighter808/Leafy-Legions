@@ -53,7 +53,17 @@ class LeaderboardScreen(BaseScreen):
                              )
 
         # Sample leaderboard data, sorted by waves in descending order
-        self.leaderboard_data = self.database_manager.get_high_scores()
+        try:
+            self.leaderboard_data = self.database_manager.get_high_scores()
+        except Exception:
+            # If database is offline, use a manual list of data
+            self.leaderboard_data = [
+                {"username": "Player1", "high_score": 100},
+                {"username": "Player2", "high_score": 90},
+                {"username": "Player3", "high_score": 80},
+                {"username": "Player4", "high_score": 70},
+                {"username": "Player5", "high_score": 60},
+            ]
 
         # Calculate the range of entries to display based on the current page number
         start_index = (self.current_page - 1) * self.entries_per_page

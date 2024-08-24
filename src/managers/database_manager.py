@@ -117,11 +117,11 @@ class DatabaseManager:
 
         stored_hash = None
 
-        # If there is a network error (TransportError), return false
+        # If there is any errors, return false
         try:
             # Find the password of the supplied username
             stored_hash = self.database.child('users').child(username).child('password').get()
-        except TransportError:
+        except Exception:
             return False
 
         if not stored_hash:
@@ -143,8 +143,11 @@ class DatabaseManager:
             return
 
         # If there is no data in the database for this user, do nothing
-        user_data_ref = self.database.child('user_data').child(username)
-        if not user_data_ref.get():
+        try:
+            user_data_ref = self.database.child('user_data').child(username)
+            if not user_data_ref.get():
+                return
+        except Exception:
             return
 
         # If the high score is greater than existing score, do nothing
